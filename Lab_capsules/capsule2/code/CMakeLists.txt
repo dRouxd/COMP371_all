@@ -22,4 +22,4 @@ include_directories(/encs/pkg/glm-0.9.9.8/root/include)
 
 add_executable(${PROJECT_NAME} capsule02.cpp) #The name of the cpp file and its path can vary
 
-target_link_libraries(${PROJECT_NAME} OpenGL::GL GLEW::glew glfw)
+target_link_libraries(${PROJECT_NAME} OpenGL::GL GLEW::GLEW glfw)
