@@ -11,6 +11,7 @@
 #include "util.hpp"
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 
 RayTracer::RayTracer(nlohmann::json j)
@@ -44,7 +45,7 @@ RayTracer::~RayTracer()
 
 void RayTracer::run()
 {
-    for(auto it = this->geometricObjects.begin(); it != this->geometricObjects.end(); ++it)
+    /*for(auto it = this->geometricObjects.begin(); it != this->geometricObjects.end(); ++it)
     {
         std::cout << (*(*it)) << std::endl;
         if((*it)->getType() == Rectangle)
@@ -75,10 +76,43 @@ void RayTracer::run()
             std::cout << (*so) << std::endl;
         }
         std::cout << std::endl;
-    }
+    }*/
 
+
+    // Output an image for every output
     for(auto it = this->outputs.begin(); it != this->outputs.end(); ++it)
     {
-        
+        Output* currentOut = (*it);
+        CameraObject* camera = currentOut->getCamera();
+
+        // Create the buffer used to output to ppm
+        Eigen::Vector3f** buf = new Eigen::Vector3f*[camera->getHeight()];
+        for(int i = 0; i < camera->getHeight(); ++i)
+        {
+            buf[i] = new Eigen::Vector3f[camera->getWidth()];
+        }
+
+        buf[100][200] << 1, 0, 0;
+        buf[100][300] << 0, 1, 0;
+        buf[100][400] << 0, 0, 1;
+        buf[250][250] << 0.5, 0.5, 0.5;
+
+        outputBufferToPPM(currentOut->getOutputFilename(), buf, camera->getWidth(), camera->getHeight());
     }
+}
+
+void RayTracer::outputBufferToPPM(std::string outputFilename, Eigen::Vector3f** buf, unsigned int w, unsigned int h)
+{
+    std::ofstream ofs(outputFilename, std::ios_base::out | std::ios_base::binary);
+    ofs << "P6" << std::endl << w << ' ' << h << std::endl << "255" << std::endl;
+
+    for (unsigned int j = 0; j < h; ++j)
+        for (unsigned int i = 0; i < w; ++i)
+        {
+            ofs << (char) (255.0 * buf[i][j](0));
+            ofs << (char) (255.0 * buf[i][j](1));
+            ofs << (char) (255.0 * buf[i][j](2));
+        }
+
+    ofs.close();
 }

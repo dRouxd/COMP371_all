@@ -19,6 +19,8 @@ public:
 
 private:
 
+    void outputBufferToPPM(std::string outputFilename, Eigen::Vector3f** buf, unsigned int w, unsigned int h);
+
     std::vector<GeometricObject*> geometricObjects;
     std::vector<LightObject*> lightObjects;
     std::vector<Output*> outputs;
