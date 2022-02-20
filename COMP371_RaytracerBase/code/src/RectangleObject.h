@@ -13,7 +13,8 @@ public:
                     Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, Eigen::Vector3f p4);
     RectangleObject(nlohmann::json j);
     RectangleObject(const RectangleObject& ro);
-    ~RectangleObject();
+    ~RectangleObject() = default;
+    void print();
 
     inline Eigen::Vector3f getP1() const { return p1; };
     inline Eigen::Vector3f getP2() const { return p2; };
@@ -27,6 +28,6 @@ private:
     Eigen::Vector3f p4;
 };
 
-RECTANGLEOBJECT_OSTREAM_OP;
+//RECTANGLEOBJECT_OSTREAM_OP;
 
 #endif

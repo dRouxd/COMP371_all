@@ -41,49 +41,43 @@ RayTracer::RayTracer(nlohmann::json j)
 
 RayTracer::~RayTracer()
 {
+    for(auto o : this->geometricObjects)
+    {
+        delete o;
+    }
+
+    for(auto l : this->lightObjects)
+    {
+        delete l;
+    }
+
+    for(auto o : this->outputs)
+    {
+        delete o;
+    }
 }
 
 void RayTracer::run()
 {
-    /*for(auto it = this->geometricObjects.begin(); it != this->geometricObjects.end(); ++it)
+    for(auto it = this->geometricObjects.begin(); it != this->geometricObjects.end(); ++it)
     {
-        std::cout << (*(*it)) << std::endl;
-        if((*it)->getType() == Rectangle)
-        {
-            RectangleObject* ro = dynamic_cast<RectangleObject*>((*it));
-            std::cout << (*ro) << std::endl;
-        }
-        else if((*it)->getType() == Sphere)
-        {
-            SphereObject* so = dynamic_cast<SphereObject*>((*it));
-            std::cout << (*so) << std::endl;
-        }
+        (*it)->print();
         std::cout << std::endl;
     }
     
 
     for(auto it = this->lightObjects.begin(); it != this->lightObjects.end(); ++it)
     {
-        std::cout << (*(*it)) << std::endl;
-        if((*it)->getType() == Point)
-        {
-            PointObject* ro = dynamic_cast<PointObject*>((*it));
-            std::cout << (*ro) << std::endl;
-        }
-        else if((*it)->getType() == Area)
-        {
-            AreaObject* so = dynamic_cast<AreaObject*>((*it));
-            std::cout << (*so) << std::endl;
-        }
+        (*it)->print();
         std::cout << std::endl;
-    }*/
+    }
 
 
     // Output an image for every output
     for(auto it = this->outputs.begin(); it != this->outputs.end(); ++it)
     {
         Output* currentOut = (*it);
-        CameraObject* camera = currentOut->getCamera();
+        Camera* camera = currentOut->getCamera();
 
         // Create the buffer used to output to ppm
         Eigen::Vector3f** buf = new Eigen::Vector3f*[camera->getHeight()];
@@ -98,6 +92,12 @@ void RayTracer::run()
         buf[250][250] << 0.5, 0.5, 0.5;
 
         outputBufferToPPM(currentOut->getOutputFilename(), buf, camera->getWidth(), camera->getHeight());
+
+        for(int i = 0; i < camera->getHeight(); ++i)
+        {
+            delete[] buf[i];
+        }
+        delete[] buf;
     }
 }
 

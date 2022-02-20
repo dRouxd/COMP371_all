@@ -30,12 +30,21 @@ RectangleObject::RectangleObject(const RectangleObject& ro) : GeometricObject(ro
     this->p4 = Eigen::Vector3f(ro.p4);
 }
 
-RectangleObject::~RectangleObject()
+void RectangleObject::print()
 {
-
+    std::cout << "[RECTANGLEOBJECT"
+        << " ac:" << GetVector3fStrOneLine(this->ac)
+        << " dc:" << GetVector3fStrOneLine(this->dc)
+        << " sc:" << GetVector3fStrOneLine(this->sc)
+        << " ka:" << this->ka << " kd:" << this->kd << " ks:" << this->ks << " pc:" << this->pc
+        << " p1:" << GetVector3fStrOneLine(this->p1)
+        << " p2:" << GetVector3fStrOneLine(this->p2)
+        << " p3:" << GetVector3fStrOneLine(this->p3)
+        << " p4:" << GetVector3fStrOneLine(this->p4)
+        << "]";
 }
 
-RECTANGLEOBJECT_OSTREAM_OP
+/*RECTANGLEOBJECT_OSTREAM_OP
 {
     os << "[RECTANGLEOBJECT"
         << " ac:" << GetVector3fStrOneLine(ro.getAC())
@@ -47,4 +56,4 @@ RECTANGLEOBJECT_OSTREAM_OP
         << " p3:" << GetVector3fStrOneLine(ro.getP3())
         << " p4:" << GetVector3fStrOneLine(ro.getP4())
         << "]";
-}
+}*/

@@ -16,16 +16,17 @@ public:
     LightObject(nlohmann::json j);
     LightObject(const LightObject& lo);
     virtual ~LightObject() = default;
+    virtual void print() = 0;
 
     inline Eigen::Vector3f getID() const { return id; };
     inline Eigen::Vector3f getIS() const { return is; };
 
-private:
+protected:
     Eigen::Vector3f id;
     Eigen::Vector3f is;
 
 };
 
-LIGHTOBJECT_OSTREAM_OP;
+//LIGHTOBJECT_OSTREAM_OP;
 
 #endif

@@ -5,7 +5,7 @@
 
 Output::Output(nlohmann::json j)
 {
-    this->camera = new CameraObject(j);
+    this->camera = new Camera(j);
     this->outputFilename = std::string(j["filename"].get<std::string>());
     
     this->ai = JsonArrayToVector3f(j["ai"]);
@@ -14,5 +14,5 @@ Output::Output(nlohmann::json j)
 
 Output::~Output()
 {
-
+    delete this->camera;
 }

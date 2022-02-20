@@ -1,10 +1,10 @@
 
-#include "CameraObject.h"
+#include "Camera.h"
 
 #include "util.hpp"
 
 
-CameraObject::CameraObject(unsigned int w, unsigned int h, float fov, Eigen::Vector3f centre, Eigen::Vector3f up, Eigen::Vector3f lookat)
+Camera::Camera(unsigned int w, unsigned int h, float fov, Eigen::Vector3f centre, Eigen::Vector3f up, Eigen::Vector3f lookat)
 {
     this->w = w;
     this->h = h;
@@ -14,7 +14,7 @@ CameraObject::CameraObject(unsigned int w, unsigned int h, float fov, Eigen::Vec
     this->lookat = lookat;
 }
 
-CameraObject::CameraObject(nlohmann::json j)
+Camera::Camera(nlohmann::json j)
 {
     this->w = j["size"][0].get<unsigned int>();
     this->h = j["size"][1].get<unsigned int>();
@@ -25,7 +25,7 @@ CameraObject::CameraObject(nlohmann::json j)
     this->lookat = JsonArrayToVector3f(j["lookat"]);
 }
 
-CameraObject::CameraObject(const CameraObject& co)
+Camera::Camera(const Camera& co)
 {
     this->w = co.w;
     this->h = co.h;
@@ -36,7 +36,7 @@ CameraObject::CameraObject(const CameraObject& co)
     this->lookat = Eigen::Vector3f(co.lookat);
 }
 
-CameraObject::~CameraObject()
+Camera::~Camera()
 {
 
 }

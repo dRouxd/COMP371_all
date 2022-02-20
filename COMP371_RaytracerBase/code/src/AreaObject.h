@@ -12,7 +12,8 @@ public:
                 Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, Eigen::Vector3f p4);
     AreaObject(nlohmann::json j);
     AreaObject(const AreaObject& ao);
-    ~AreaObject();
+    ~AreaObject() = default;
+    void print();
 
     inline Eigen::Vector3f getP1() const { return p1; };
     inline Eigen::Vector3f getP2() const { return p2; };
@@ -26,6 +27,6 @@ private:
     Eigen::Vector3f p4;
 };
 
-AREAOBJECT_OSTREAM_OP;
+//AREAOBJECT_OSTREAM_OP;
 
 #endif

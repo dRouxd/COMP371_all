@@ -7,13 +7,13 @@
 
 #define CAMERAOBJECT_OSTREAM_OP std::ostream& operator<<(std::ostream& os, const CameraObject co)
 
-class CameraObject
+class Camera
 {
 public:
-    CameraObject(unsigned int w, unsigned int h, float fov, Eigen::Vector3f centre, Eigen::Vector3f up, Eigen::Vector3f lookat);
-    CameraObject(nlohmann::json j);
-    CameraObject(const CameraObject& co);
-    ~CameraObject();
+    Camera(unsigned int w, unsigned int h, float fov, Eigen::Vector3f centre, Eigen::Vector3f up, Eigen::Vector3f lookat);
+    Camera(nlohmann::json j);
+    Camera(const Camera& co);
+    ~Camera();
 
     inline unsigned int getWidth() const { return w; }
     inline unsigned int getHeight() const { return h; }

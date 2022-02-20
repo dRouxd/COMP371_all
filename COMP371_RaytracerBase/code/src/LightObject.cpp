@@ -21,10 +21,10 @@ LightObject::LightObject(const LightObject& lo) : Object(lo)
     this->is = Eigen::Vector3f(lo.is);
 }
 
-LIGHTOBJECT_OSTREAM_OP
+/*LIGHTOBJECT_OSTREAM_OP
 {
     os << "[LIGHTOBJECT type:" << ObjectTypeToString(lo.getType())
         << " id:" << GetVector3fStrOneLine(lo.getID())
         << " is:" << GetVector3fStrOneLine(lo.getIS())
         << "]";
-}
+}*/

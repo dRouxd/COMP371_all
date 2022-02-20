@@ -23,18 +23,24 @@ SphereObject::SphereObject(const SphereObject& so) : GeometricObject(so)
     this->radius = so.radius;
 }
 
-SphereObject::~SphereObject()
-{
-
-}
-
 Eigen::Vector3f SphereObject::getNormalFromPointOnSphere(Eigen::Vector3f point) const
 {
     // TODO: Calculate the normal using the center of the sphere and the given point
     return Eigen::Vector3f(1.0, 1.0, 1.0);
 }
 
-SPHEREOBJECT_OSTREAM_OP
+void SphereObject::print()
+{
+    std::cout << "[SPHEREOBJECT"
+        << " ac:" << GetVector3fStrOneLine(this->ac)
+        << " dc:" << GetVector3fStrOneLine(this->dc)
+        << " sc:" << GetVector3fStrOneLine(this->sc)
+        << " ka:" << this->ka << " kd:" << this->kd << " ks:" << this->ks << " pc:" << this->pc
+        << " center: " << GetVector3fStrOneLine(this->centre) << " radius: " << this->radius
+        << "]";
+}
+
+/*SPHEREOBJECT_OSTREAM_OP
 {
     os << "[SPHEREOBJECT"
         << " ac:" << GetVector3fStrOneLine(ro.getAC())
@@ -43,4 +49,4 @@ SPHEREOBJECT_OSTREAM_OP
         << " ka:" << ro.getKA() << " kd:" << ro.getKD() << " ks:" << ro.getKS() << " pc:" << ro.getPC()
         << " center: " << GetVector3fStrOneLine(ro.getCentre()) << " radius: " << ro.getRadius()
         << "]";
-}
+}*/

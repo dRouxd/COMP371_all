@@ -28,12 +28,19 @@ AreaObject::AreaObject(const AreaObject& ao) : LightObject(ao)
     this->p4 = Eigen::Vector3f(ao.p4);
 }
 
-AreaObject::~AreaObject()
+void AreaObject::print()
 {
-
+    std::cout << "[AREAOBJECT"
+        << " id:" << GetVector3fStrOneLine(this->id)
+        << " is:" << GetVector3fStrOneLine(this->is)
+        << " p1:" << GetVector3fStrOneLine(this->p1)
+        << " p2:" << GetVector3fStrOneLine(this->p2)
+        << " p3:" << GetVector3fStrOneLine(this->p3)
+        << " p4:" << GetVector3fStrOneLine(this->p4)
+        << "]";
 }
 
-AREAOBJECT_OSTREAM_OP
+/*AREAOBJECT_OSTREAM_OP
 {
     os << "[AREAOBJECT"
         << " id:" << GetVector3fStrOneLine(ao.getID())
@@ -43,4 +50,4 @@ AREAOBJECT_OSTREAM_OP
         << " p3:" << GetVector3fStrOneLine(ao.getP3())
         << " p4:" << GetVector3fStrOneLine(ao.getP4())
         << "]";
-}
+}*/

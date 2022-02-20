@@ -18,16 +18,19 @@ PointObject::PointObject(const PointObject& po) : LightObject(po)
     this->centre = Eigen::Vector3f(po.centre);
 }
 
-PointObject::~PointObject()
+void PointObject::print()
 {
-
+    std::cout << "[POINTOBJECT id:" << GetVector3fStrOneLine(this->id)
+        << " is:" << GetVector3fStrOneLine(this->is)
+        << " centre:" << GetVector3fStrOneLine(this->centre)
+        << "]";
 }
 
-POINTOBJECT_OSTREAM_OP
+/*POINTOBJECT_OSTREAM_OP
 {
     os << "[POINTOBJECT type:" << ObjectTypeToString(po.getType())
         << " id:" << GetVector3fStrOneLine(po.getID())
         << " is:" << GetVector3fStrOneLine(po.getIS())
         << " centre:" << GetVector3fStrOneLine(po.getCentre())
         << "]";
-}
+}*/

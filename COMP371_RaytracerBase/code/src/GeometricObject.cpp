@@ -46,7 +46,7 @@ GeometricObject::GeometricObject(const GeometricObject& go) : Object(go)
     this->pc = go.pc;
 }
 
-GEOMETRICOBJECT_OSTREAM_OP
+/*GEOMETRICOBJECT_OSTREAM_OP
 {
     os << "[GEOMETRICOBJECT type:" << ObjectTypeToString(go.getType())
         << " ac:" << GetVector3fStrOneLine(go.getAC())
@@ -54,4 +54,4 @@ GEOMETRICOBJECT_OSTREAM_OP
         << " sc:" << GetVector3fStrOneLine(go.getSC())
         << " ka:" << go.getKA() << " kd:" << go.getKD() << " ks:" << go.getKS() << " pc:" << go.getPC()
         << "]";
-}
+}*/

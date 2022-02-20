@@ -17,6 +17,7 @@ public:
     GeometricObject(nlohmann::json j);
     GeometricObject(const GeometricObject& go);
     virtual ~GeometricObject() = default;
+    virtual void print() = 0;
 
     inline Eigen::Vector3f getAC() const { return ac; };
     inline Eigen::Vector3f getDC() const { return dc; };
@@ -28,7 +29,7 @@ public:
 
     inline float getPC() const { return pc; };
 
-private:
+protected:
     Eigen::Vector3f ac;
     Eigen::Vector3f dc;
     Eigen::Vector3f sc;
@@ -41,6 +42,6 @@ private:
 
 };
 
-GEOMETRICOBJECT_OSTREAM_OP;
+//GEOMETRICOBJECT_OSTREAM_OP;
 
 #endif

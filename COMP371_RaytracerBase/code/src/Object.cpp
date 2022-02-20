@@ -21,8 +21,3 @@ Object::Object(const Object& o)
 {
     this->type = o.type;
 }
-
-OBJECT_OSTREAM_OP
-{
-    os << "[Object type:" << ObjectTypeToString(o.getType()) << "]";
-}

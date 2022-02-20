@@ -3,7 +3,7 @@
 
 #include "GeometricObject.h"
 
-#define SPHEREOBJECT_OSTREAM_OP std::ostream& operator<<(std::ostream& os, const SphereObject ro)
+//#define SPHEREOBJECT_OSTREAM_OP std::ostream& operator<<(std::ostream& os, const SphereObject ro)
 
 class SphereObject : public GeometricObject
 {
@@ -12,7 +12,8 @@ public:
                     float ka, float kd, float ks, float pc, Eigen::Vector3f centre, float radius);
     SphereObject(nlohmann::json j);
     SphereObject(const SphereObject& so);
-    ~SphereObject();
+    ~SphereObject() = default;
+    void print();
 
     inline Eigen::Vector3f getCentre() const { return centre; };
     inline float getRadius() const { return radius; };
@@ -24,6 +25,6 @@ private:
     float radius;
 };
 
-SPHEREOBJECT_OSTREAM_OP;
+//SPHEREOBJECT_OSTREAM_OP;
 
 #endif
