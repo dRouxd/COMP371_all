@@ -5,7 +5,7 @@
 
 #include "json.hpp"
 
-#define CAMERAOBJECT_OSTREAM_OP std::ostream& operator<<(std::ostream& os, const CameraObject co)
+#define CAMERAOBJECT_OSTREAM_OP std::ostream& operator<<(std::ostream& os, const Camera co)
 
 class Camera
 {
@@ -21,6 +21,7 @@ public:
     inline Eigen::Vector3f getCentre() const { return centre; };
     inline Eigen::Vector3f getUp() const { return up; };
     inline Eigen::Vector3f getLookat() const { return lookat; };
+    inline Eigen::Vector3f getRight() const { return right; };
 
 private:
     unsigned int w;
@@ -29,6 +30,7 @@ private:
     Eigen::Vector3f centre;
     Eigen::Vector3f up;
     Eigen::Vector3f lookat;
+    Eigen::Vector3f right;
 };
 
 CAMERAOBJECT_OSTREAM_OP;

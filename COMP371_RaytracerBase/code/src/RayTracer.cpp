@@ -1,22 +1,20 @@
 
 #include "RayTracer.h"
+
 #include "RectangleObject.h"
 #include "SphereObject.h"
-
 #include "PointObject.h"
 #include "AreaObject.h"
-
-#include "CameraObject.h"
 
 #include "util.hpp"
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 
 RayTracer::RayTracer(nlohmann::json j)
 {
-    //
     nlohmann::json geometries = j["geometry"];
     for(auto it = geometries.begin(); it != geometries.end(); ++it)
     {
@@ -59,7 +57,7 @@ RayTracer::~RayTracer()
 
 void RayTracer::run()
 {
-    for(auto it = this->geometricObjects.begin(); it != this->geometricObjects.end(); ++it)
+    /*for(auto it = this->geometricObjects.begin(); it != this->geometricObjects.end(); ++it)
     {
         (*it)->print();
         std::cout << std::endl;
@@ -70,10 +68,10 @@ void RayTracer::run()
     {
         (*it)->print();
         std::cout << std::endl;
-    }
+    }*/
 
 
-    // Output an image for every output
+    // Export image for every output
     for(auto it = this->outputs.begin(); it != this->outputs.end(); ++it)
     {
         Output* currentOut = (*it);
@@ -86,10 +84,23 @@ void RayTracer::run()
             buf[i] = new Eigen::Vector3f[camera->getWidth()];
         }
 
-        buf[100][200] << 1, 0, 0;
-        buf[100][300] << 0, 1, 0;
-        buf[100][400] << 0, 0, 1;
-        buf[250][250] << 0.5, 0.5, 0.5;
+        // For every pixel
+        for(int x = 0; x < camera->getHeight(); ++x)
+        {
+            for(int y = 0; y < camera->getWidth(); ++y)
+            {
+                // Create a ray at the center of the pixel
+                Ray* r = CreateRayFromCamera(camera, x, y);
+
+                // TODO: Using local illumination, find the color of that ray
+
+                // Assign the color of that ray to the corresponding pixel
+                Eigen::Vector3f c = r->getColor();
+                buf[x][y] << c.coeff(0), c.coeff(1), c.coeff(2);
+
+                delete r;
+            }
+        }
 
         outputBufferToPPM(currentOut->getOutputFilename(), buf, camera->getWidth(), camera->getHeight());
 

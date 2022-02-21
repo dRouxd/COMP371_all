@@ -32,21 +32,21 @@ Eigen::Vector3f SphereObject::getNormalFromPointOnSphere(Eigen::Vector3f point) 
 void SphereObject::print()
 {
     std::cout << "[SPHEREOBJECT"
-        << " ac:" << GetVector3fStrOneLine(this->ac)
-        << " dc:" << GetVector3fStrOneLine(this->dc)
-        << " sc:" << GetVector3fStrOneLine(this->sc)
+        << " ac:" << PrintVector3fStrOneLine(this->ac)
+        << " dc:" << PrintVector3fStrOneLine(this->dc)
+        << " sc:" << PrintVector3fStrOneLine(this->sc)
         << " ka:" << this->ka << " kd:" << this->kd << " ks:" << this->ks << " pc:" << this->pc
-        << " center: " << GetVector3fStrOneLine(this->centre) << " radius: " << this->radius
+        << " center: " << PrintVector3fStrOneLine(this->centre) << " radius: " << this->radius
         << "]";
 }
 
 /*SPHEREOBJECT_OSTREAM_OP
 {
     os << "[SPHEREOBJECT"
-        << " ac:" << GetVector3fStrOneLine(ro.getAC())
-        << " dc:" << GetVector3fStrOneLine(ro.getDC())
-        << " sc:" << GetVector3fStrOneLine(ro.getSC())
+        << " ac:" << PrintVector3fStrOneLine(ro.getAC())
+        << " dc:" << PrintVector3fStrOneLine(ro.getDC())
+        << " sc:" << PrintVector3fStrOneLine(ro.getSC())
         << " ka:" << ro.getKA() << " kd:" << ro.getKD() << " ks:" << ro.getKS() << " pc:" << ro.getPC()
-        << " center: " << GetVector3fStrOneLine(ro.getCentre()) << " radius: " << ro.getRadius()
+        << " center: " << PrintVector3fStrOneLine(ro.getCentre()) << " radius: " << ro.getRadius()
         << "]";
 }*/

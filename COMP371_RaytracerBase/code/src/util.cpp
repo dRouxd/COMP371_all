@@ -5,10 +5,12 @@
 #include "PointObject.h"
 #include "AreaObject.h"
 
+#include <Eigen/Geometry>
+
 #include <stdexcept>
 #include <sstream>
 #include <iostream>
-#include <cmath>
+#include <math.h>
 
 const char* ObjectTypeToString(ObjectType type)
 {
@@ -95,7 +97,25 @@ LightObject* CreateLightObjectFromJson(nlohmann::json j)
     return lo;
 }
 
-const char* GetMatrixXfStrOneLine(Eigen::MatrixXf m)
+Ray* CreateRayFromCamera(Camera* cam, int x, int y)
+{
+    float halfDelta = cam->getFov() / 2;
+    float tanFov = tan(halfDelta);
+    float pixSize = (2 * tanFov) / cam->getHeight();
+
+    Eigen::Vector3f A = cam->getCentre() + cam->getLookat();
+    Eigen::Vector3f B = A + (tanFov * cam->getUp());
+    Eigen::Vector3f C = B - ( (cam->getWidth() / 2) * pixSize * cam->getRight() );
+
+    Eigen::Vector3f pixelCenter = C + ((y * pixSize + halfDelta) * cam->getRight()) - ((x * pixSize + halfDelta) * cam->getUp());
+    Eigen::Vector3f direction = (pixelCenter - cam->getCentre()) / (pixelCenter - cam->getCentre()).norm();
+
+    Ray* ray = new Ray(cam->getCentre(), direction);
+
+    return ray;
+}
+
+std::string GetMatrixXfStrOneLine(const Eigen::MatrixXf& m)
 {
     std::stringstream ss;
 
@@ -120,10 +140,10 @@ const char* GetMatrixXfStrOneLine(Eigen::MatrixXf m)
     if(m.cols() > 1)
         ss << "]";
 
-    return ss.str().c_str();
+    return ss.str();
 }
 
-const char* GetVector3fStrOneLine(Eigen::Vector3f v)
+std::string PrintVector3fStrOneLine(const Eigen::Vector3f& v)
 {
-    return GetMatrixXfStrOneLine(static_cast<Eigen::MatrixXf>(v)); 
+    return GetMatrixXfStrOneLine(static_cast<Eigen::MatrixXf>(v));
 }

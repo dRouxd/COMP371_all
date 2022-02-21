@@ -20,17 +20,17 @@ PointObject::PointObject(const PointObject& po) : LightObject(po)
 
 void PointObject::print()
 {
-    std::cout << "[POINTOBJECT id:" << GetVector3fStrOneLine(this->id)
-        << " is:" << GetVector3fStrOneLine(this->is)
-        << " centre:" << GetVector3fStrOneLine(this->centre)
+    std::cout << "[POINTOBJECT id:" << PrintVector3fStrOneLine(this->id)
+        << " is:" << PrintVector3fStrOneLine(this->is)
+        << " centre:" << PrintVector3fStrOneLine(this->centre)
         << "]";
 }
 
 /*POINTOBJECT_OSTREAM_OP
 {
     os << "[POINTOBJECT type:" << ObjectTypeToString(po.getType())
-        << " id:" << GetVector3fStrOneLine(po.getID())
-        << " is:" << GetVector3fStrOneLine(po.getIS())
-        << " centre:" << GetVector3fStrOneLine(po.getCentre())
+        << " id:" << PrintVector3fStrOneLine(po.getID())
+        << " is:" << PrintVector3fStrOneLine(po.getIS())
+        << " centre:" << PrintVector3fStrOneLine(po.getCentre())
         << "]";
 }*/

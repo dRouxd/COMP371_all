@@ -33,27 +33,27 @@ RectangleObject::RectangleObject(const RectangleObject& ro) : GeometricObject(ro
 void RectangleObject::print()
 {
     std::cout << "[RECTANGLEOBJECT"
-        << " ac:" << GetVector3fStrOneLine(this->ac)
-        << " dc:" << GetVector3fStrOneLine(this->dc)
-        << " sc:" << GetVector3fStrOneLine(this->sc)
+        << " ac:" << PrintVector3fStrOneLine(this->ac)
+        << " dc:" << PrintVector3fStrOneLine(this->dc)
+        << " sc:" << PrintVector3fStrOneLine(this->sc)
         << " ka:" << this->ka << " kd:" << this->kd << " ks:" << this->ks << " pc:" << this->pc
-        << " p1:" << GetVector3fStrOneLine(this->p1)
-        << " p2:" << GetVector3fStrOneLine(this->p2)
-        << " p3:" << GetVector3fStrOneLine(this->p3)
-        << " p4:" << GetVector3fStrOneLine(this->p4)
+        << " p1:" << PrintVector3fStrOneLine(this->p1)
+        << " p2:" << PrintVector3fStrOneLine(this->p2)
+        << " p3:" << PrintVector3fStrOneLine(this->p3)
+        << " p4:" << PrintVector3fStrOneLine(this->p4)
         << "]";
 }
 
 /*RECTANGLEOBJECT_OSTREAM_OP
 {
     os << "[RECTANGLEOBJECT"
-        << " ac:" << GetVector3fStrOneLine(ro.getAC())
-        << " dc:" << GetVector3fStrOneLine(ro.getDC())
-        << " sc:" << GetVector3fStrOneLine(ro.getSC())
+        << " ac:" << PrintVector3fStrOneLine(ro.getAC())
+        << " dc:" << PrintVector3fStrOneLine(ro.getDC())
+        << " sc:" << PrintVector3fStrOneLine(ro.getSC())
         << " ka:" << ro.getKA() << " kd:" << ro.getKD() << " ks:" << ro.getKS() << " pc:" << ro.getPC()
-        << " p1:" << GetVector3fStrOneLine(ro.getP1())
-        << " p2:" << GetVector3fStrOneLine(ro.getP2())
-        << " p3:" << GetVector3fStrOneLine(ro.getP3())
-        << " p4:" << GetVector3fStrOneLine(ro.getP4())
+        << " p1:" << PrintVector3fStrOneLine(ro.getP1())
+        << " p2:" << PrintVector3fStrOneLine(ro.getP2())
+        << " p3:" << PrintVector3fStrOneLine(ro.getP3())
+        << " p4:" << PrintVector3fStrOneLine(ro.getP4())
         << "]";
 }*/

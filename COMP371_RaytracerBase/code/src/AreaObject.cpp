@@ -31,23 +31,23 @@ AreaObject::AreaObject(const AreaObject& ao) : LightObject(ao)
 void AreaObject::print()
 {
     std::cout << "[AREAOBJECT"
-        << " id:" << GetVector3fStrOneLine(this->id)
-        << " is:" << GetVector3fStrOneLine(this->is)
-        << " p1:" << GetVector3fStrOneLine(this->p1)
-        << " p2:" << GetVector3fStrOneLine(this->p2)
-        << " p3:" << GetVector3fStrOneLine(this->p3)
-        << " p4:" << GetVector3fStrOneLine(this->p4)
+        << " id:" << PrintVector3fStrOneLine(this->id)
+        << " is:" << PrintVector3fStrOneLine(this->is)
+        << " p1:" << PrintVector3fStrOneLine(this->p1)
+        << " p2:" << PrintVector3fStrOneLine(this->p2)
+        << " p3:" << PrintVector3fStrOneLine(this->p3)
+        << " p4:" << PrintVector3fStrOneLine(this->p4)
         << "]";
 }
 
 /*AREAOBJECT_OSTREAM_OP
 {
     os << "[AREAOBJECT"
-        << " id:" << GetVector3fStrOneLine(ao.getID())
-        << " is:" << GetVector3fStrOneLine(ao.getIS())
-        << " p1:" << GetVector3fStrOneLine(ao.getP1())
-        << " p2:" << GetVector3fStrOneLine(ao.getP2())
-        << " p3:" << GetVector3fStrOneLine(ao.getP3())
-        << " p4:" << GetVector3fStrOneLine(ao.getP4())
+        << " id:" << PrintVector3fStrOneLine(ao.getID())
+        << " is:" << PrintVector3fStrOneLine(ao.getIS())
+        << " p1:" << PrintVector3fStrOneLine(ao.getP1())
+        << " p2:" << PrintVector3fStrOneLine(ao.getP2())
+        << " p3:" << PrintVector3fStrOneLine(ao.getP3())
+        << " p4:" << PrintVector3fStrOneLine(ao.getP4())
         << "]";
 }*/

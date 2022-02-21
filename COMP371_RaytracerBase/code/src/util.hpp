@@ -3,7 +3,8 @@
 
 #include "GeometricObject.h"
 #include "LightObject.h"
-
+#include "Ray.h"
+#include "Camera.h"
 
 #include "json.hpp"
 
@@ -21,9 +22,11 @@ GeometricObject* CreateGeometricObjectFromJson(nlohmann::json j);
 
 LightObject* CreateLightObjectFromJson(nlohmann::json j);
 
-const char* GetMatrixXfStrOneLine(Eigen::MatrixXf m);
+Ray* CreateRayFromCamera(Camera* camera, int x, int y);
 
-const char* GetVector3fStrOneLine(Eigen::Vector3f v);
+std::string PrintMatrixXfStrOneLine(const Eigen::MatrixXf& m);
+
+std::string PrintVector3fStrOneLine(const Eigen::Vector3f& v);
 
 
 

@@ -3,6 +3,7 @@
 
 #include "util.hpp"
 
+#include <Eigen/Geometry>
 
 Camera::Camera(unsigned int w, unsigned int h, float fov, Eigen::Vector3f centre, Eigen::Vector3f up, Eigen::Vector3f lookat)
 {
@@ -23,6 +24,7 @@ Camera::Camera(nlohmann::json j)
     this->centre = JsonArrayToVector3f(j["centre"]);
     this->up = JsonArrayToVector3f(j["up"]);
     this->lookat = JsonArrayToVector3f(j["lookat"]);
+    this->right = this->lookat.cross(this->up);
 }
 
 Camera::Camera(const Camera& co)
@@ -46,8 +48,8 @@ CAMERAOBJECT_OSTREAM_OP
     os << "[CAMERAOBJECT"
         << " w:" << co.getWidth()
         << " h:" << co.getHeight()
-        << " centre:" << GetVector3fStrOneLine(co.getCentre())
-        << " up:" << GetVector3fStrOneLine(co.getUp())
-        << " lookat:" << GetVector3fStrOneLine(co.getLookat())
+        << " centre:" << PrintVector3fStrOneLine(co.getCentre())
+        << " up:" << PrintVector3fStrOneLine(co.getUp())
+        << " lookat:" << PrintVector3fStrOneLine(co.getLookat())
         << "]";
 }
