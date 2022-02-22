@@ -24,6 +24,9 @@ public:
     inline Eigen::Vector3f getRight() const { return right; };
 
 private:
+
+    void calcRight() const;
+
     unsigned int w;
     unsigned int h;
     float fov;
