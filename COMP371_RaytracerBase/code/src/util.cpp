@@ -99,15 +99,15 @@ LightObject* CreateLightObjectFromJson(nlohmann::json j)
 
 Ray* CreateRayFromCamera(Camera* cam, int x, int y)
 {
-    float halfDelta = cam->getFov() / 2;
-    float tanFov = tan(halfDelta);
+    float tanFov = tan((cam->getFov() / 2) * M_PI / 180);
     float pixSize = (2 * tanFov) / cam->getHeight();
+    float halfPixSize = pixSize / 2;
 
     Eigen::Vector3f A = cam->getCentre() + cam->getLookat();
     Eigen::Vector3f B = A + (tanFov * cam->getUp());
     Eigen::Vector3f C = B - ( (cam->getWidth() / 2) * pixSize * cam->getRight() );
 
-    Eigen::Vector3f pixelCenter = C + ((y * pixSize + halfDelta) * cam->getRight()) - ((x * pixSize + halfDelta) * cam->getUp());
+    Eigen::Vector3f pixelCenter = C + ((x * pixSize + halfPixSize) * cam->getRight()) - ((y * pixSize + halfPixSize) * cam->getUp());
     Eigen::Vector3f direction = (pixelCenter - cam->getCentre()) / (pixelCenter - cam->getCentre()).norm();
 
     Ray* ray = new Ray(cam->getCentre(), direction);
