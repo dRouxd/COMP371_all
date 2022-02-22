@@ -26,3 +26,8 @@ void Ray::print()
                 << " color:" << PrintVector3fStrOneLine(this->color) 
                 << "]";
 }
+
+void Ray::setColor(const Eigen::Vector3f& color)
+{
+    this->color = Eigen::Vector3f(color);
+}
