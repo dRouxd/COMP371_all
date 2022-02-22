@@ -5,13 +5,15 @@
 #include "SphereObject.h"
 #include "PointObject.h"
 #include "AreaObject.h"
-
 #include "util.hpp"
+
+#include <Eigen/Dense>
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <cmath>
 
 RayTracer::RayTracer(nlohmann::json j)
 {
@@ -92,11 +94,14 @@ void RayTracer::run()
                 // Create a ray at the center of the pixel
                 Ray* r = CreateRayFromCamera(camera, x, y);
 
-                // TODO: Using local illumination, find the color of that ray
+                if(rayIntersectObjects(r))
+                    buf[x][y] << r->getColor()(0), r->getColor()(1), r->getColor()(2);
+                else
+                    buf[x][y] << currentOut->getBKC()(0), currentOut->getBKC()(1), currentOut->getBKC()(2);
 
                 // Assign the color of that ray to the corresponding pixel
-                Eigen::Vector3f c = r->getColor();
-                buf[x][y] << c.coeff(0), c.coeff(1), c.coeff(2);
+                //Eigen::Vector3f c = r->getColor();
+                //buf[x][y] << c.coeff(0), c.coeff(1), c.coeff(2);
 
                 delete r;
             }
@@ -126,4 +131,66 @@ void RayTracer::outputBufferToPPM(std::string outputFilename, Eigen::Vector3f** 
         }
 
     ofs.close();
+}
+
+bool RayTracer::rayIntersectObjects(Ray* ray)
+{
+    GeometricObject* closestObject = NULL;
+    float closestDist = -1.0;
+
+    for(auto o : this->geometricObjects)
+    {
+        if(o->getType() == ObjectType::Sphere)
+        {
+            SphereObject* so = dynamic_cast<SphereObject*>(o);
+
+            Eigen::Vector3f p;
+            float distToObject = rayIntersectSphere(ray, so, p);
+            if(distToObject >= 0 && (!closestObject || distToObject < closestDist))
+            {
+                closestObject = so;
+                closestDist = distToObject;
+            }
+        }
+    }
+
+    if(closestObject)
+    {
+        ray->setColor(closestObject->getDC());
+        Eigen::Vector3f point = ray->getOrigin() + closestDist * ray->getDirection();
+    }
+
+    return closestDist >= 0;
+}
+
+float RayTracer::rayIntersectSphere(Ray* ray, SphereObject* so)
+{
+    // Tutorial: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
+    float dist = -1.0;
+
+    Eigen::Vector3f L = so->getCentre() - ray->getOrigin();
+    float tca = L.dot(ray->getDirection());
+    if(tca < 0)
+        return dist;
+
+    float d = sqrt(L.dot(L) - tca * tca);
+    if(d >= so->getRadius())
+        return dist;
+
+    float thc = sqrt(pow(so->getRadius(), 2) - d*d);
+
+    // Sphere intersection points
+    float t0 = tca - thc;
+    float t1 = tca + thc;
+
+    // If sphere is ahead of camera
+    if(t0 > 0 && t1 > 0)
+        dist = t0;
+
+    // If camera is in sphere
+    else if(t0 < 0 && t1 > 0)
+        dist = t1;
+
+    return dist;
+
 }

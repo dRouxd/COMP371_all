@@ -1,9 +1,11 @@
 #ifndef RAYTRACER_H
 #define RAYTRACER_H
 
-#include "GeometricObject.h"
+#include "SphereObject.h"
+#include "RectangleObject.h"
 #include "LightObject.h"
 #include "Output.h"
+#include "Ray.h"
 
 #include "json.hpp"
 
@@ -20,6 +22,9 @@ public:
 private:
 
     void outputBufferToPPM(std::string outputFilename, Eigen::Vector3f** buf, unsigned int w, unsigned int h);
+    
+    bool rayIntersectObjects(Ray* ray);
+    float rayIntersectSphere(Ray* ray, SphereObject* so);
 
     std::vector<GeometricObject*> geometricObjects;
     std::vector<LightObject*> lightObjects;
