@@ -140,17 +140,23 @@ bool RayTracer::rayIntersectObjects(Ray* ray)
 
     for(auto o : this->geometricObjects)
     {
+        float distToObject = -1.0;
         if(o->getType() == ObjectType::Sphere)
         {
             SphereObject* so = dynamic_cast<SphereObject*>(o);
+            distToObject = rayIntersectSphere(ray, so);
+        }
 
-            Eigen::Vector3f p;
-            float distToObject = rayIntersectSphere(ray, so, p);
-            if(distToObject >= 0 && (!closestObject || distToObject < closestDist))
-            {
-                closestObject = so;
-                closestDist = distToObject;
-            }
+        if(o->getType() == ObjectType::Rectangle)
+        {
+            RectangleObject* ro = dynamic_cast<RectangleObject*>(o);
+            distToObject = rayIntersectRect(ray, ro);
+        }
+        
+        if(distToObject >= 0 && (!closestObject || distToObject < closestDist))
+        {
+            closestObject = o;
+            closestDist = distToObject;
         }
     }
 
@@ -165,23 +171,22 @@ bool RayTracer::rayIntersectObjects(Ray* ray)
 
 float RayTracer::rayIntersectSphere(Ray* ray, SphereObject* so)
 {
-    // Tutorial: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
     float dist = -1.0;
 
     Eigen::Vector3f L = so->getCentre() - ray->getOrigin();
-    float tca = L.dot(ray->getDirection());
-    if(tca < 0)
+    float ld = L.dot(ray->getDirection());
+    if(ld < 0)
         return dist;
 
-    float d = sqrt(L.dot(L) - tca * tca);
-    if(d >= so->getRadius())
+    float lld = sqrt(L.dot(L) - ld * ld);
+    if(lld >= so->getRadius())
         return dist;
 
-    float thc = sqrt(pow(so->getRadius(), 2) - d*d);
+    float rlld = sqrt(pow(so->getRadius(), 2) - lld*lld);
 
     // Sphere intersection points
-    float t0 = tca - thc;
-    float t1 = tca + thc;
+    float t0 = ld - rlld;
+    float t1 = ld + rlld;
 
     // If sphere is ahead of camera
     if(t0 > 0 && t1 > 0)
@@ -193,4 +198,43 @@ float RayTracer::rayIntersectSphere(Ray* ray, SphereObject* so)
 
     return dist;
 
+}
+
+float RayTracer::rayIntersectRect(Ray* ray, RectangleObject* ro)
+{
+    Eigen::Vector3f N = ro->getNormal();
+    float dist = -1.0;
+    
+    float a = N.dot(ray->getDirection());
+
+    // Is the ray and the plane parallel?
+    if (std::fpclassify(fabs(a)) == FP_ZERO)
+        return dist;
+
+    float t = N.dot(ro->getP1() - ray->getOrigin()) / a;
+
+    // Is the plan behind the ray?
+    if(t < 0)
+        return dist;
+
+    Eigen::Vector3f p = ray->getOrigin() + t * ray->getDirection();
+
+    // Is the point inside the rectangle?
+    Eigen::Vector3f e1 = ro->getP2() - ro->getP1();
+    Eigen::Vector3f e2 = ro->getP3() - ro->getP2();
+    Eigen::Vector3f e3 = ro->getP4() - ro->getP3();
+    Eigen::Vector3f e4 = ro->getP1() - ro->getP4();
+
+    Eigen::Vector3f c1 = p - ro->getP1();
+    Eigen::Vector3f c2 = p - ro->getP2();
+    Eigen::Vector3f c3 = p - ro->getP3();
+    Eigen::Vector3f c4 = p - ro->getP4();
+
+    if( N.dot(e1.cross(c1)) > 0 &&
+        N.dot(e2.cross(c2)) > 0 &&
+        N.dot(e3.cross(c3)) > 0 &&
+        N.dot(e4.cross(c4)) > 0)
+        dist = t;
+
+    return dist;
 }

@@ -20,7 +20,7 @@ public:
     inline Eigen::Vector3f getP2() const { return p2; };
     inline Eigen::Vector3f getP3() const { return p3; };
     inline Eigen::Vector3f getP4() const { return p4; };
-    inline Eigen::Vector3f getNormal() const { return p4; };
+    inline Eigen::Vector3f getNormal() const { return normal; };
 
 private:
 

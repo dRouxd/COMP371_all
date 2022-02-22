@@ -52,7 +52,7 @@ void RectangleObject::print()
 
 void RectangleObject::calcNormal()
 {
-    this->normal = (p1 - p2).cross(p3 - p2).normalized();
+    this->normal = (p2 - p1).cross(p3 - p1).normalized();
 }
 
 /*RECTANGLEOBJECT_OSTREAM_OP

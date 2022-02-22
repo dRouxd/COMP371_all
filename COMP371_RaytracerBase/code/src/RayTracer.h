@@ -25,6 +25,7 @@ private:
     
     bool rayIntersectObjects(Ray* ray);
     float rayIntersectSphere(Ray* ray, SphereObject* so);
+    float rayIntersectRect(Ray* ray, RectangleObject* ro);
 
     std::vector<GeometricObject*> geometricObjects;
     std::vector<LightObject*> lightObjects;

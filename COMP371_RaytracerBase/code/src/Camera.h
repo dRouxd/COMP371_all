@@ -25,7 +25,7 @@ public:
 
 private:
 
-    void calcRight() const;
+    void calcRight();
 
     unsigned int w;
     unsigned int h;

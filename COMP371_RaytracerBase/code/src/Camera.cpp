@@ -45,7 +45,7 @@ Camera::~Camera()
 
 }
 
-void Camera::calcRight() const
+void Camera::calcRight()
 {
     this->right = this->lookat.cross(this->up);
 }
