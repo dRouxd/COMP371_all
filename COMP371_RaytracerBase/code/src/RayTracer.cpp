@@ -59,20 +59,6 @@ RayTracer::~RayTracer()
 
 void RayTracer::run()
 {
-    /*for(auto it = this->geometricObjects.begin(); it != this->geometricObjects.end(); ++it)
-    {
-        (*it)->print();
-        std::cout << std::endl;
-    }
-    
-
-    for(auto it = this->lightObjects.begin(); it != this->lightObjects.end(); ++it)
-    {
-        (*it)->print();
-        std::cout << std::endl;
-    }*/
-
-
     // Export image for every output
     for(auto it = this->outputs.begin(); it != this->outputs.end(); ++it)
     {
@@ -94,8 +80,14 @@ void RayTracer::run()
                 // Create a ray at the center of the pixel
                 Ray* r = CreateRayFromCamera(camera, x, y);
 
-                if(rayIntersectObjects(r, currentOut))
+                float distToHit = -1.0f;
+                GeometricObject* oHit = rayIntersectObjects(r, distToHit);
+
+                if(oHit)
+                {
+                    calculateRayColorOnObject(r, oHit, distToHit, currentOut);
                     buf[x][y] << r->getColor()(0), r->getColor()(1), r->getColor()(2);
+                }
                 else
                     buf[x][y] << currentOut->getBKC()(0), currentOut->getBKC()(1), currentOut->getBKC()(2);
 
@@ -133,7 +125,7 @@ void RayTracer::outputBufferToPPM(std::string outputFilename, Eigen::Vector3f** 
     ofs.close();
 }
 
-bool RayTracer::rayIntersectObjects(Ray* ray, Output* out)
+GeometricObject* RayTracer::rayIntersectObjects(Ray* ray, float& dist)
 {
     GeometricObject* closestObject = NULL;
     float closestDist = -1.0;
@@ -161,70 +153,8 @@ bool RayTracer::rayIntersectObjects(Ray* ray, Output* out)
         }
     }
 
-    // Was any object hit by the ray?
-    if(!closestObject)
-        return false;
-
-    Eigen::Vector3f point = ray->getOrigin() + closestDist * ray->getDirection();
-    Eigen::Vector3f normalFromObject;
-    if(closestObject->getType() == ObjectType::Rectangle)
-        normalFromObject = dynamic_cast<RectangleObject*>(closestObject)->getNormal();
-    else
-    {
-        normalFromObject = CreateNormalFrom2Points(dynamic_cast<SphereObject*>(closestObject)->getCentre(), point);
-    }
-
-    // Ambiant component
-    float LRa = closestObject->getKA() * closestObject->getAC()(0) * out->getAI()(0);
-    float LGa = closestObject->getKA() * closestObject->getAC()(1) * out->getAI()(0);
-    float LBa = closestObject->getKA() * closestObject->getAC()(2) * out->getAI()(0);
-
-    // Combine all components
-    float LR = LRa;// + LRd + LRs;
-    float LG = LGa;// + LGd + LGs;
-    float LB = LBa;// + LBd + LBs;
-
-    for(auto l : this->lightObjects)
-    {
-        PointObject* light = dynamic_cast<PointObject*>(l);
-        Eigen::Vector3f lightDirection = CreateNormalFrom2Points(point, light->getCentre());
-        
-        // I: Intensity of the light for each color
-        float IR = light->getIS()(0) * light->getID()(0);
-        float IG = light->getIS()(1) * light->getID()(1);
-        float IB = light->getIS()(2) * light->getID()(2);
-
-        // Diffuse component of the color value
-        float maxD = std::max(0.0f, normalFromObject.dot(lightDirection));
-        float LRd = (closestObject->getKD() * closestObject->getDC()(0)) * maxD;
-        float LGd = (closestObject->getKD() * closestObject->getDC()(1)) * maxD;
-        float LBd = (closestObject->getKD() * closestObject->getDC()(2)) * maxD;
-
-        // Specular component of the color value
-        Eigen::Vector3f v = CreateNormalFrom2Points(point, ray->getOrigin());
-        Eigen::Vector3f R = (2.0f * normalFromObject * (normalFromObject.dot(lightDirection)) - lightDirection);
-        Eigen::Vector3f H = (ray->getDirection() + v) / (ray->getDirection() + v).norm();
-        float maxS = std::pow(std::max(0.0f, R.dot(v)), closestObject->getPC());
-        float LRs = (closestObject->getKS() * closestObject->getSC()(0)) * maxS;
-        float LGs = (closestObject->getKS() * closestObject->getSC()(1)) * maxS;
-        float LBs = (closestObject->getKS() * closestObject->getSC()(2)) * maxS;
-
-        LR += IR * (LRd + LRs);
-        LG += IG * (LGd + LGs);
-        LB += IB * (LBd + LBs);
-    }
-
-    // Clamp light value between 0 and 1
-    LR = std::min(LR, 1.0f);
-    LG = std::min(LG, 1.0f);
-    LB = std::min(LB, 1.0f);
-
-    Eigen::Vector3f rayColor(LR, LG, LB);
-
-    ray->setColor(rayColor);
-    
-
-    return true;
+    dist = closestDist;
+    return closestObject;
 }
 
 float RayTracer::rayIntersectSphere(Ray* ray, SphereObject* so)
@@ -295,4 +225,65 @@ float RayTracer::rayIntersectRect(Ray* ray, RectangleObject* ro)
         dist = t;
 
     return dist;
+}
+
+void RayTracer::calculateRayColorOnObject(Ray* ray, GeometricObject* o, float oDist, Output* out)
+{
+    Eigen::Vector3f point = ray->getOrigin() + oDist * ray->getDirection();
+    Eigen::Vector3f normalFromObject;
+    if(o->getType() == ObjectType::Rectangle)
+        normalFromObject = dynamic_cast<RectangleObject*>(o)->getNormal();
+    else
+    {
+        normalFromObject = CreateNormalFrom2Points(dynamic_cast<SphereObject*>(o)->getCentre(), point);
+    }
+
+    // Ambiant component
+    float LRa = o->getKA() * o->getAC()(0) * out->getAI()(0);
+    float LGa = o->getKA() * o->getAC()(1) * out->getAI()(0);
+    float LBa = o->getKA() * o->getAC()(2) * out->getAI()(0);
+
+    // Combine all components
+    float LR = LRa;// + LRd + LRs;
+    float LG = LGa;// + LGd + LGs;
+    float LB = LBa;// + LBd + LBs;
+
+    for(auto l : this->lightObjects)
+    {
+        PointObject* light = dynamic_cast<PointObject*>(l);
+        Eigen::Vector3f lightDirection = CreateNormalFrom2Points(point, light->getCentre());
+        
+        // I: Intensity of the light for each color
+        float IR = light->getIS()(0) * light->getID()(0);
+        float IG = light->getIS()(1) * light->getID()(1);
+        float IB = light->getIS()(2) * light->getID()(2);
+
+        // Diffuse component of the color value
+        float maxD = std::max(0.0f, normalFromObject.dot(lightDirection));
+        float LRd = (o->getKD() * o->getDC()(0)) * maxD;
+        float LGd = (o->getKD() * o->getDC()(1)) * maxD;
+        float LBd = (o->getKD() * o->getDC()(2)) * maxD;
+
+        // Specular component of the color value
+        Eigen::Vector3f v = CreateNormalFrom2Points(point, ray->getOrigin());
+        Eigen::Vector3f R = (2.0f * normalFromObject * (normalFromObject.dot(lightDirection)) - lightDirection);
+        Eigen::Vector3f H = (ray->getDirection() + v) / (ray->getDirection() + v).norm();
+        float maxS = std::pow(std::max(0.0f, R.dot(v)), o->getPC());
+        float LRs = (o->getKS() * o->getSC()(0)) * maxS;
+        float LGs = (o->getKS() * o->getSC()(1)) * maxS;
+        float LBs = (o->getKS() * o->getSC()(2)) * maxS;
+
+        LR += IR * (LRd + LRs);
+        LG += IG * (LGd + LGs);
+        LB += IB * (LBd + LBs);
+    }
+
+    // Clamp light value between 0 and 1
+    LR = std::min(LR, 1.0f);
+    LG = std::min(LG, 1.0f);
+    LB = std::min(LB, 1.0f);
+
+    Eigen::Vector3f rayColor(LR, LG, LB);
+
+    ray->setColor(rayColor);
 }

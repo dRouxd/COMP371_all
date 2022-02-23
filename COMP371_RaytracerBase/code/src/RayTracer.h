@@ -23,9 +23,10 @@ private:
 
     void outputBufferToPPM(std::string outputFilename, Eigen::Vector3f** buf, unsigned int w, unsigned int h);
     
-    bool rayIntersectObjects(Ray* ray, Output* out);
+    GeometricObject* rayIntersectObjects(Ray* ray, float& dist);
     float rayIntersectSphere(Ray* ray, SphereObject* so);
     float rayIntersectRect(Ray* ray, RectangleObject* ro);
+    void calculateRayColorOnObject(Ray* ray, GeometricObject* o, float oDist, Output* out);
 
     std::vector<GeometricObject*> geometricObjects;
     std::vector<LightObject*> lightObjects;
