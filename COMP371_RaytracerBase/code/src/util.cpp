@@ -115,6 +115,11 @@ Ray* CreateRayFromCamera(Camera* cam, int x, int y)
     return ray;
 }
 
+Eigen::Vector3f CreateNormalFrom2Points(Eigen::Vector3f p1, Eigen::Vector3f p2)
+{
+    return (p2 - p1) / (p2 - p1).norm();
+}
+
 std::string GetMatrixXfStrOneLine(const Eigen::MatrixXf& m)
 {
     std::stringstream ss;

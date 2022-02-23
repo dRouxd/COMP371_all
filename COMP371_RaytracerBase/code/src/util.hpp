@@ -24,6 +24,8 @@ LightObject* CreateLightObjectFromJson(nlohmann::json j);
 
 Ray* CreateRayFromCamera(Camera* camera, int x, int y);
 
+Eigen::Vector3f CreateNormalFrom2Points(Eigen::Vector3f p1, Eigen::Vector3f p2);
+
 std::string PrintMatrixXfStrOneLine(const Eigen::MatrixXf& m);
 
 std::string PrintVector3fStrOneLine(const Eigen::Vector3f& v);
