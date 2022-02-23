@@ -115,6 +115,12 @@ Ray* CreateRayFromCamera(Camera* cam, int x, int y)
     return ray;
 }
 
+Ray* CreateRayFromPoints(Eigen::Vector3f p1, Eigen::Vector3f p2)
+{
+    Eigen::Vector3f direction = (p2 - p1) / (p2 - p1).norm();
+    return new Ray(Eigen::Vector3f(p1), direction);
+}
+
 Eigen::Vector3f CreateNormalFrom2Points(Eigen::Vector3f p1, Eigen::Vector3f p2)
 {
     return (p2 - p1) / (p2 - p1).norm();

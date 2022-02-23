@@ -229,7 +229,7 @@ float RayTracer::rayIntersectRect(Ray* ray, RectangleObject* ro)
 
 void RayTracer::calculateRayColorOnObject(Ray* ray, GeometricObject* o, float oDist, Output* out)
 {
-    Eigen::Vector3f point = ray->getOrigin() + oDist * ray->getDirection();
+    Eigen::Vector3f point = ray->getOrigin() + (oDist - 0.00001) * ray->getDirection();
     Eigen::Vector3f normalFromObject;
     if(o->getType() == ObjectType::Rectangle)
         normalFromObject = dynamic_cast<RectangleObject*>(o)->getNormal();
@@ -252,6 +252,14 @@ void RayTracer::calculateRayColorOnObject(Ray* ray, GeometricObject* o, float oD
     {
         PointObject* light = dynamic_cast<PointObject*>(l);
         Eigen::Vector3f lightDirection = CreateNormalFrom2Points(point, light->getCentre());
+        
+        Ray* rayToLight = new Ray(point, lightDirection);
+        float tmp = -1.0f;
+        GeometricObject* lightObstructed = rayIntersectObjects(rayToLight, tmp);
+        delete rayToLight;
+        
+        if(lightObstructed)
+            continue;
         
         // I: Intensity of the light for each color
         float IR = light->getIS()(0) * light->getID()(0);
