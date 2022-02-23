@@ -80,9 +80,9 @@ void RayTracer::run()
                 // Create a ray at the center of the pixel
                 Ray* r = CreateRayFromCamera(camera, x, y);
 
+                // Check if the ray hits any objects
                 float distToHit = -1.0f;
                 GeometricObject* oHit = rayIntersectObjects(r, distToHit);
-
                 if(oHit)
                 {
                     calculateRayColorOnObject(r, oHit, distToHit, currentOut);
@@ -90,10 +90,6 @@ void RayTracer::run()
                 }
                 else
                     buf[x][y] << currentOut->getBKC()(0), currentOut->getBKC()(1), currentOut->getBKC()(2);
-
-                // Assign the color of that ray to the corresponding pixel
-                //Eigen::Vector3f c = r->getColor();
-                //buf[x][y] << c.coeff(0), c.coeff(1), c.coeff(2);
 
                 delete r;
             }
