@@ -3,8 +3,6 @@
 
 #include "LightObject.h"
 
-#define AREAOBJECT_OSTREAM_OP std::ostream& operator<<(std::ostream& os, const AreaObject ao)
-
 class AreaObject : public LightObject
 {
 public:
@@ -26,7 +24,5 @@ private:
     Eigen::Vector3f p3;
     Eigen::Vector3f p4;
 };
-
-//AREAOBJECT_OSTREAM_OP;
 
 #endif

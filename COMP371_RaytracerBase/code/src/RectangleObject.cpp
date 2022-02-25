@@ -5,10 +5,10 @@
 
 #include <Eigen/Geometry>
 
-RectangleObject::RectangleObject(ObjectType type, Eigen::Vector3f ac, Eigen::Vector3f dc, Eigen::Vector3f sc,
+RectangleObject::RectangleObject(std::string comment, Eigen::Vector3f ac, Eigen::Vector3f dc, Eigen::Vector3f sc,
                     float ka, float kd, float ks, float pc, 
                     Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, Eigen::Vector3f p4):
-                    GeometricObject(type, ac, dc, sc, ka, kd, ks, pc)
+                    GeometricObject(ObjectType::Rectangle, comment, ac, dc, sc, ka, kd, ks, pc)
 {
     this->p1 = p1;
     this->p2 = p2;
@@ -54,17 +54,3 @@ void RectangleObject::calcNormal()
 {
     this->normal = (p2 - p1).cross(p3 - p1).normalized();
 }
-
-/*RECTANGLEOBJECT_OSTREAM_OP
-{
-    os << "[RECTANGLEOBJECT"
-        << " ac:" << PrintVector3fStrOneLine(ro.getAC())
-        << " dc:" << PrintVector3fStrOneLine(ro.getDC())
-        << " sc:" << PrintVector3fStrOneLine(ro.getSC())
-        << " ka:" << ro.getKA() << " kd:" << ro.getKD() << " ks:" << ro.getKS() << " pc:" << ro.getPC()
-        << " p1:" << PrintVector3fStrOneLine(ro.getP1())
-        << " p2:" << PrintVector3fStrOneLine(ro.getP2())
-        << " p3:" << PrintVector3fStrOneLine(ro.getP3())
-        << " p4:" << PrintVector3fStrOneLine(ro.getP4())
-        << "]";
-}*/

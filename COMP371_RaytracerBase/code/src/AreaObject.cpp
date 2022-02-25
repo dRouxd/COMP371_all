@@ -39,15 +39,3 @@ void AreaObject::print()
         << " p4:" << PrintVector3fStrOneLine(this->p4)
         << "]";
 }
-
-/*AREAOBJECT_OSTREAM_OP
-{
-    os << "[AREAOBJECT"
-        << " id:" << PrintVector3fStrOneLine(ao.getID())
-        << " is:" << PrintVector3fStrOneLine(ao.getIS())
-        << " p1:" << PrintVector3fStrOneLine(ao.getP1())
-        << " p2:" << PrintVector3fStrOneLine(ao.getP2())
-        << " p3:" << PrintVector3fStrOneLine(ao.getP3())
-        << " p4:" << PrintVector3fStrOneLine(ao.getP4())
-        << "]";
-}*/

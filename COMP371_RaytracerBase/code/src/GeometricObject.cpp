@@ -3,7 +3,7 @@
 
 #include "util.hpp"
 
-GeometricObject::GeometricObject(ObjectType type, Eigen::Vector3f ac, Eigen::Vector3f dc, Eigen::Vector3f sc,
+GeometricObject::GeometricObject(ObjectType type, std::string comment, Eigen::Vector3f ac, Eigen::Vector3f dc, Eigen::Vector3f sc,
                                 float ka, float kd, float ks,
                                 float pc) : Object(type)
 {
@@ -17,6 +17,8 @@ GeometricObject::GeometricObject(ObjectType type, Eigen::Vector3f ac, Eigen::Vec
     this->ks = ks;
 
     this->pc = pc;
+
+    this->comment = comment;
 }
 
 GeometricObject::GeometricObject(nlohmann::json j) : Object(j)
@@ -31,6 +33,9 @@ GeometricObject::GeometricObject(nlohmann::json j) : Object(j)
     this->ks = j["ks"].get<float>();
 
     this->pc = j["pc"].get<float>();
+
+    
+    this->comment = j.contains(std::string("comment")) ? j["comment"].get<std::string>() : std::string("");
 }
 
 GeometricObject::GeometricObject(const GeometricObject& go) : Object(go)
@@ -44,14 +49,6 @@ GeometricObject::GeometricObject(const GeometricObject& go) : Object(go)
     this->ks = go.ks;
     
     this->pc = go.pc;
-}
 
-/*GEOMETRICOBJECT_OSTREAM_OP
-{
-    os << "[GEOMETRICOBJECT type:" << ObjectTypeToString(go.getType())
-        << " ac:" << GetVector3fStrOneLine(go.getAC())
-        << " dc:" << GetVector3fStrOneLine(go.getDC())
-        << " sc:" << GetVector3fStrOneLine(go.getSC())
-        << " ka:" << go.getKA() << " kd:" << go.getKD() << " ks:" << go.getKS() << " pc:" << go.getPC()
-        << "]";
-}*/
+    this->comment = go.comment;
+}

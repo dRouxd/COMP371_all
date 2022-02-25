@@ -7,8 +7,6 @@
 
 #include <iostream>
 
-#define LIGHTOBJECT_OSTREAM_OP std::ostream& operator<<(std::ostream& os, const LightObject lo)
-
 class LightObject : public Object
 {
 public:
@@ -26,7 +24,5 @@ protected:
     Eigen::Vector3f is;
 
 };
-
-//LIGHTOBJECT_OSTREAM_OP;
 
 #endif

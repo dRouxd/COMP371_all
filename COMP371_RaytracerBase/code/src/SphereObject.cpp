@@ -3,9 +3,9 @@
 
 #include "util.hpp"
 
-SphereObject::SphereObject(ObjectType type, Eigen::Vector3f ac, Eigen::Vector3f dc, Eigen::Vector3f sc,
+SphereObject::SphereObject(std::string comment, Eigen::Vector3f ac, Eigen::Vector3f dc, Eigen::Vector3f sc,
                     float ka, float kd, float ks, float pc, Eigen::Vector3f centre, float radius):
-                    GeometricObject(type, ac, dc, sc, ka, kd, ks, pc)
+                    GeometricObject(ObjectType::Sphere, comment, ac, dc, sc, ka, kd, ks, pc)
 {
     this->centre = centre;
     this->radius = radius;
@@ -39,14 +39,3 @@ void SphereObject::print()
         << " center: " << PrintVector3fStrOneLine(this->centre) << " radius: " << this->radius
         << "]";
 }
-
-/*SPHEREOBJECT_OSTREAM_OP
-{
-    os << "[SPHEREOBJECT"
-        << " ac:" << PrintVector3fStrOneLine(ro.getAC())
-        << " dc:" << PrintVector3fStrOneLine(ro.getDC())
-        << " sc:" << PrintVector3fStrOneLine(ro.getSC())
-        << " ka:" << ro.getKA() << " kd:" << ro.getKD() << " ks:" << ro.getKS() << " pc:" << ro.getPC()
-        << " center: " << PrintVector3fStrOneLine(ro.getCentre()) << " radius: " << ro.getRadius()
-        << "]";
-}*/
