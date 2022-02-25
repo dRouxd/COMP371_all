@@ -73,9 +73,9 @@ void RayTracer::run()
         }
 
         // For every pixel
-        for(int x = 0; x < camera->getHeight(); ++x)
+        for(int y = 0; y < camera->getHeight(); ++y)
         {
-            for(int y = 0; y < camera->getWidth(); ++y)
+            for(int x = 0; x < camera->getWidth(); ++x)
             {
                 // Create a ray at the center of the pixel
                 Ray* r = CreateRayFromCamera(camera, x, y);
@@ -86,10 +86,10 @@ void RayTracer::run()
                 if(oHit)
                 {
                     calculateRayColorOnObject(r, oHit, distToHit, currentOut);
-                    buf[x][y] << r->getColor()(0), r->getColor()(1), r->getColor()(2);
+                    buf[y][x] << r->getColor()(0), r->getColor()(1), r->getColor()(2);
                 }
                 else
-                    buf[x][y] << currentOut->getBKC()(0), currentOut->getBKC()(1), currentOut->getBKC()(2);
+                    buf[y][x] << currentOut->getBKC()(0), currentOut->getBKC()(1), currentOut->getBKC()(2);
 
                 delete r;
             }
@@ -110,14 +110,13 @@ void RayTracer::outputBufferToPPM(std::string outputFilename, Eigen::Vector3f** 
     std::ofstream ofs(outputFilename, std::ios_base::out | std::ios_base::binary);
     ofs << "P6" << std::endl << w << ' ' << h << std::endl << "255" << std::endl;
 
-    for (unsigned int j = 0; j < h; ++j)
-        for (unsigned int i = 0; i < w; ++i)
+    for (unsigned int y = 0; y < h; ++y)
+        for (unsigned int x = 0; x < w; ++x)
         {
-            ofs << (char) (255.0 * buf[i][j](0));
-            ofs << (char) (255.0 * buf[i][j](1));
-            ofs << (char) (255.0 * buf[i][j](2));
+            ofs << (char) (255.0 * buf[y][x](0));
+            ofs << (char) (255.0 * buf[y][x](1));
+            ofs << (char) (255.0 * buf[y][x](2));
         }
-
     ofs.close();
 }
 
@@ -197,7 +196,7 @@ float RayTracer::rayIntersectRect(Ray* ray, RectangleObject* ro)
 
     float t = N.dot(ro->getP1() - ray->getOrigin()) / a;
 
-    // Is the plan behind the ray?
+    // Is the plane behind the ray?
     if(t < 0)
         return dist;
 
@@ -229,11 +228,16 @@ void RayTracer::calculateRayColorOnObject(Ray* ray, GeometricObject* o, float oD
     Eigen::Vector3f point = ray->getOrigin() + (oDist - 0.00001) * ray->getDirection();
     Eigen::Vector3f normalFromObject;
     if(o->getType() == ObjectType::Rectangle)
+    {
         normalFromObject = dynamic_cast<RectangleObject*>(o)->getNormal();
+    }
     else
     {
         normalFromObject = CreateNormalFrom2Points(dynamic_cast<SphereObject*>(o)->getCentre(), point);
     }
+
+    if(normalFromObject.dot(ray->getDirection()) > 0)
+        normalFromObject = -normalFromObject;
 
     // Ambiant component
     float LRa = o->getKA() * o->getAC()(0) * out->getAI()(0);
@@ -252,11 +256,11 @@ void RayTracer::calculateRayColorOnObject(Ray* ray, GeometricObject* o, float oD
         
         // Check if there's any objects in the path of to the light
         Ray* rayToLight = new Ray(point, lightDirection);
-        float tmp = -1.0f;
-        GeometricObject* lightObstructed = rayIntersectObjects(rayToLight, tmp);
+        float distToObs = -1.0f;
+        GeometricObject* lightObstructed = rayIntersectObjects(rayToLight, distToObs);
         delete rayToLight;
         
-        if(lightObstructed)
+        if(lightObstructed && distToObs < GetDistanceBetween2Points(point, light->getCentre()))
             continue;
         
         // I: Intensity of the light for each color
@@ -273,8 +277,8 @@ void RayTracer::calculateRayColorOnObject(Ray* ray, GeometricObject* o, float oD
         // Specular component of the color value
         Eigen::Vector3f v = CreateNormalFrom2Points(point, ray->getOrigin());
         Eigen::Vector3f R = (2.0f * normalFromObject * (normalFromObject.dot(lightDirection)) - lightDirection);
-        Eigen::Vector3f H = (ray->getDirection() + v) / (ray->getDirection() + v).norm();
-        float maxS = std::pow(std::max(0.0f, R.dot(v)), o->getPC());
+        Eigen::Vector3f H = (v + lightDirection) / (v + lightDirection).norm();
+        float maxS = std::pow(std::max(0.0f, normalFromObject.dot(H)), o->getPC());
         float LRs = (o->getKS() * o->getSC()(0)) * maxS;
         float LGs = (o->getKS() * o->getSC()(1)) * maxS;
         float LBs = (o->getKS() * o->getSC()(2)) * maxS;

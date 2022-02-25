@@ -32,6 +32,6 @@ std::string PrintMatrixXfStrOneLine(const Eigen::MatrixXf& m);
 
 std::string PrintVector3fStrOneLine(const Eigen::Vector3f& v);
 
-
+float GetDistanceBetween2Points(Eigen::Vector3f p1, Eigen::Vector3f p2);
 
 #endif

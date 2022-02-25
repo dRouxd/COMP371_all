@@ -158,3 +158,8 @@ std::string PrintVector3fStrOneLine(const Eigen::Vector3f& v)
 {
     return GetMatrixXfStrOneLine(static_cast<Eigen::MatrixXf>(v));
 }
+
+float GetDistanceBetween2Points(Eigen::Vector3f p1, Eigen::Vector3f p2)
+{
+    return std::sqrt(std::pow(p2(0) - p1(0), 2) + std::pow(p2(1) - p1(1), 2) + std::pow(p2(2) - p1(2), 2));
+}
