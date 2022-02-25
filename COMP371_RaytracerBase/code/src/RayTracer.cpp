@@ -225,7 +225,7 @@ float RayTracer::rayIntersectRect(Ray* ray, RectangleObject* ro)
 void RayTracer::calculateRayColorOnObject(Ray* ray, GeometricObject* o, float oDist, Output* out)
 {
     // Offset by small value to remove numerical imprecision.
-    Eigen::Vector3f point = ray->getOrigin() + (oDist - 0.00001) * ray->getDirection();
+    Eigen::Vector3f point = ray->getOrigin() + (oDist - 0.001) * ray->getDirection();
     Eigen::Vector3f normalFromObject;
     if(o->getType() == ObjectType::Rectangle)
     {
