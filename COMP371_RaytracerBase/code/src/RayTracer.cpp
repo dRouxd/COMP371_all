@@ -85,7 +85,7 @@ void RayTracer::run()
                 GeometricObject* oHit = rayIntersectObjects(r, distToHit);
                 if(oHit)
                 {
-                    calculateRayColorOnObject(r, oHit, distToHit, currentOut);
+                    calcRayColor(r, oHit, distToHit, currentOut);
                     buf[y][x] << r->getColor()(0), r->getColor()(1), r->getColor()(2);
                 }
                 else
@@ -222,22 +222,18 @@ float RayTracer::rayIntersectRect(Ray* ray, RectangleObject* ro)
     return dist;
 }
 
-void RayTracer::calculateRayColorOnObject(Ray* ray, GeometricObject* o, float oDist, Output* out)
+void RayTracer::calcRayColor(Ray* ray, GeometricObject* o, float oDist, Output* out)
+{
+    if(out->getGlobalIllum())
+        calcRayColorGlobal(ray, o, oDist, out);
+    else
+        calcRayColorLocal(ray, o, oDist, out);
+}
+
+void RayTracer::calcRayColorLocal(Ray* ray, GeometricObject* o, float oDist, Output* out)
 {
     // Offset by small value to remove numerical imprecision.
     Eigen::Vector3f point = ray->getOrigin() + (oDist - 0.001) * ray->getDirection();
-    Eigen::Vector3f normalFromObject;
-    if(o->getType() == ObjectType::Rectangle)
-    {
-        normalFromObject = dynamic_cast<RectangleObject*>(o)->getNormal();
-    }
-    else
-    {
-        normalFromObject = CreateNormalFrom2Points(dynamic_cast<SphereObject*>(o)->getCentre(), point);
-    }
-
-    if(normalFromObject.dot(ray->getDirection()) > 0)
-        normalFromObject = -normalFromObject;
 
     // Ambiant component
     float LRa = o->getKA() * o->getAC()(0) * out->getAI()(0);
@@ -251,41 +247,7 @@ void RayTracer::calculateRayColorOnObject(Ray* ray, GeometricObject* o, float oD
 
     for(auto l : this->lightObjects)
     {
-        PointObject* light = dynamic_cast<PointObject*>(l);
-        Eigen::Vector3f lightDirection = CreateNormalFrom2Points(point, light->getCentre());
-        
-        // Check if there's any objects in the path of to the light
-        Ray* rayToLight = new Ray(point, lightDirection);
-        float distToObs = -1.0f;
-        GeometricObject* lightObstructed = rayIntersectObjects(rayToLight, distToObs);
-        delete rayToLight;
-        
-        if(lightObstructed && distToObs < GetDistanceBetween2Points(point, light->getCentre()))
-            continue;
-        
-        // I: Intensity of the light for each color
-        float IR = light->getIS()(0) * light->getID()(0);
-        float IG = light->getIS()(1) * light->getID()(1);
-        float IB = light->getIS()(2) * light->getID()(2);
-
-        // Diffuse component of the color value
-        float maxD = std::max(0.0f, normalFromObject.dot(lightDirection));
-        float LRd = (o->getKD() * o->getDC()(0)) * maxD;
-        float LGd = (o->getKD() * o->getDC()(1)) * maxD;
-        float LBd = (o->getKD() * o->getDC()(2)) * maxD;
-
-        // Specular component of the color value
-        Eigen::Vector3f v = CreateNormalFrom2Points(point, ray->getOrigin());
-        Eigen::Vector3f R = (2.0f * normalFromObject * (normalFromObject.dot(lightDirection)) - lightDirection);
-        Eigen::Vector3f H = (v + lightDirection) / (v + lightDirection).norm();
-        float maxS = std::pow(std::max(0.0f, normalFromObject.dot(H)), o->getPC());
-        float LRs = (o->getKS() * o->getSC()(0)) * maxS;
-        float LGs = (o->getKS() * o->getSC()(1)) * maxS;
-        float LBs = (o->getKS() * o->getSC()(2)) * maxS;
-
-        LR += IR * (LRd + LRs);
-        LG += IG * (LGd + LGs);
-        LB += IB * (LBd + LBs);
+        calcBSDF(point, ray, o, l, LR, LG, LB);
     }
 
     // Clamp light value between 0 and 1
@@ -295,4 +257,68 @@ void RayTracer::calculateRayColorOnObject(Ray* ray, GeometricObject* o, float oD
 
     Eigen::Vector3f rayColor(LR, LG, LB);
     ray->setColor(rayColor);
+}
+
+void RayTracer::calcRayColorGlobal(Ray* ray, GeometricObject* o, float oDist, Output* out)
+{
+    
+}
+
+Eigen::Vector3f RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, GeometricObject* o, LightObject* l, float& LR, float& LG, float& LB)
+{
+    Eigen::Vector3f normalFromObject;
+    if(o->getType() == ObjectType::Rectangle)
+    {
+        normalFromObject = dynamic_cast<RectangleObject*>(o)->getNormal();
+    } else
+    {
+        normalFromObject = CreateNormalFrom2Points(dynamic_cast<SphereObject*>(o)->getCentre(), p);
+    }
+
+    if(normalFromObject.dot(r->getDirection()) > 0)
+        normalFromObject = -normalFromObject;
+
+    Eigen::Vector3f lightDirection;
+
+    // TODO: if point light, keep that, otherwise do monte carlo integration on area light
+    if(l->getType() == ObjectType::Point)
+    {
+        PointObject* po = dynamic_cast<PointObject*>(l);
+        lightDirection = CreateNormalFrom2Points(p, po->getCentre());
+        
+        // Check if there's any objects in the path of to the light
+        Ray* rayToLight = new Ray(p, lightDirection);
+        float distToObs = -1.0f;
+        GeometricObject* lightObstructed = rayIntersectObjects(rayToLight, distToObs);
+        delete rayToLight;
+        
+        if(lightObstructed && distToObs < GetDistanceBetween2Points(p, po->getCentre()))
+            return Eigen::Vector3f(0.0, 0.0, 0.0);
+    }
+    
+    // I: Intensity of the light for each color
+    float IR = l->getIS()(0) * l->getID()(0);
+    float IG = l->getIS()(1) * l->getID()(1);
+    float IB = l->getIS()(2) * l->getID()(2);
+
+    // Diffuse component of the color value
+    float maxD = std::max(0.0f, normalFromObject.dot(lightDirection));
+    float LRd = (o->getKD() * o->getDC()(0)) * maxD;
+    float LGd = (o->getKD() * o->getDC()(1)) * maxD;
+    float LBd = (o->getKD() * o->getDC()(2)) * maxD;
+
+    // Specular component of the color value
+    Eigen::Vector3f v = CreateNormalFrom2Points(p, r->getOrigin());
+    Eigen::Vector3f R = (2.0f * normalFromObject * (normalFromObject.dot(lightDirection)) - lightDirection);
+    Eigen::Vector3f H = (v + lightDirection).normalized();
+    float maxS = std::pow(std::max(0.0f, normalFromObject.dot(H)), o->getPC());
+    float LRs = (o->getKS() * o->getSC()(0)) * maxS;
+    float LGs = (o->getKS() * o->getSC()(1)) * maxS;
+    float LBs = (o->getKS() * o->getSC()(2)) * maxS;
+
+    LR += IR * (LRd + LRs);
+    LG += IG * (LGd + LGs);
+    LB += IB * (LBd + LBs);
+
+    return Eigen::Vector3f(0.0, 0.0, 0.0);
 }

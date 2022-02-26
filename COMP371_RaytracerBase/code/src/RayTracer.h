@@ -26,7 +26,10 @@ private:
     GeometricObject* rayIntersectObjects(Ray* ray, float& dist);
     float rayIntersectSphere(Ray* ray, SphereObject* so);
     float rayIntersectRect(Ray* ray, RectangleObject* ro);
-    void calculateRayColorOnObject(Ray* ray, GeometricObject* o, float oDist, Output* out);
+    void calcRayColor(Ray* ray, GeometricObject* o, float oDist, Output* out);
+    void calcRayColorLocal(Ray* ray, GeometricObject* o, float oDist, Output* out);
+    void calcRayColorGlobal(Ray* ray, GeometricObject* o, float oDist, Output* out);
+    Eigen::Vector3f calcBSDF(Eigen::Vector3f p, Ray* ray, GeometricObject* o, LightObject* l, float& LR, float& LG, float& LB);
 
     std::vector<GeometricObject*> geometricObjects;
     std::vector<LightObject*> lightObjects;
