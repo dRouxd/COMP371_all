@@ -3,6 +3,8 @@
 
 #include <Eigen/Core>
 
+class RGB;
+
 class Ray
 {
 public:
@@ -15,6 +17,7 @@ public:
     inline Eigen::Vector3f getOrigin() const { return origin; };
     inline Eigen::Vector3f getColor() const { return color; };
     void setColor(const Eigen::Vector3f& color);
+    void setColor(const RGB& color);
 
 private:
     Eigen::Vector3f origin;

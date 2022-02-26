@@ -6,6 +6,7 @@
 #include "PointObject.h"
 #include "AreaObject.h"
 #include "util.hpp"
+#include "RGB.h"
 
 #include <Eigen/Dense>
 
@@ -236,27 +237,32 @@ void RayTracer::calcRayColorLocal(Ray* ray, GeometricObject* o, float oDist, Out
     Eigen::Vector3f point = ray->getOrigin() + (oDist - 0.001) * ray->getDirection();
 
     // Ambiant component
-    float LRa = o->getKA() * o->getAC()(0) * out->getAI()(0);
+    /*float LRa = o->getKA() * o->getAC()(0) * out->getAI()(0);
     float LGa = o->getKA() * o->getAC()(1) * out->getAI()(0);
-    float LBa = o->getKA() * o->getAC()(2) * out->getAI()(0);
+    float LBa = o->getKA() * o->getAC()(2) * out->getAI()(0);*/
+    RGB L(o->getKA() * o->getAC()(0) * out->getAI()(0), 
+            o->getKA() * o->getAC()(1) * out->getAI()(0), 
+            o->getKA() * o->getAC()(2) * out->getAI()(0));
 
     // Combine all components
-    float LR = LRa;// + LRd + LRs;
+    /*float LR = LRa;// + LRd + LRs;
     float LG = LGa;// + LGd + LGs;
-    float LB = LBa;// + LBd + LBs;
-
+    float LB = LBa;// + LBd + LBs;*/
+    
     for(auto l : this->lightObjects)
     {
-        calcBSDF(point, ray, o, l, LR, LG, LB);
+        L += calcBSDF(point, ray, o, l);
     }
 
     // Clamp light value between 0 and 1
-    LR = std::min(LR, 1.0f);
+    /*LR = std::min(LR, 1.0f);
     LG = std::min(LG, 1.0f);
-    LB = std::min(LB, 1.0f);
+    LB = std::min(LB, 1.0f);*/
+    L(0) = std::min(L(0), 1.0f);
+    L(1) = std::min(L(1), 1.0f);
+    L(2) = std::min(L(2), 1.0f);
 
-    Eigen::Vector3f rayColor(LR, LG, LB);
-    ray->setColor(rayColor);
+    ray->setColor(L);
 }
 
 void RayTracer::calcRayColorGlobal(Ray* ray, GeometricObject* o, float oDist, Output* out)
@@ -264,7 +270,7 @@ void RayTracer::calcRayColorGlobal(Ray* ray, GeometricObject* o, float oDist, Ou
     
 }
 
-Eigen::Vector3f RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, GeometricObject* o, LightObject* l, float& LR, float& LG, float& LB)
+RGB RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, GeometricObject* o, LightObject* l)
 {
     Eigen::Vector3f normalFromObject;
     if(o->getType() == ObjectType::Rectangle)
@@ -293,32 +299,39 @@ Eigen::Vector3f RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, GeometricObject* 
         delete rayToLight;
         
         if(lightObstructed && distToObs < GetDistanceBetween2Points(p, po->getCentre()))
-            return Eigen::Vector3f(0.0, 0.0, 0.0);
+            return RGB(0.0, 0.0, 0.0);
     }
     
     // I: Intensity of the light for each color
-    float IR = l->getIS()(0) * l->getID()(0);
+    /*float IR = l->getIS()(0) * l->getID()(0);
     float IG = l->getIS()(1) * l->getID()(1);
-    float IB = l->getIS()(2) * l->getID()(2);
+    float IB = l->getIS()(2) * l->getID()(2);*/
+    RGB IL(l->getIS()(0) * l->getID()(0), l->getIS()(1) * l->getID()(1), l->getIS()(2) * l->getID()(2));
 
     // Diffuse component of the color value
     float maxD = std::max(0.0f, normalFromObject.dot(lightDirection));
-    float LRd = (o->getKD() * o->getDC()(0)) * maxD;
+    /*float LRd = (o->getKD() * o->getDC()(0)) * maxD;
     float LGd = (o->getKD() * o->getDC()(1)) * maxD;
-    float LBd = (o->getKD() * o->getDC()(2)) * maxD;
+    float LBd = (o->getKD() * o->getDC()(2)) * maxD;*/
+    RGB ID(o->getKD() * o->getDC()(0), o->getKD() * o->getDC()(1), o->getKD() * o->getDC()(2));
+    ID *= maxD;
 
     // Specular component of the color value
     Eigen::Vector3f v = CreateNormalFrom2Points(p, r->getOrigin());
     Eigen::Vector3f R = (2.0f * normalFromObject * (normalFromObject.dot(lightDirection)) - lightDirection);
     Eigen::Vector3f H = (v + lightDirection).normalized();
     float maxS = std::pow(std::max(0.0f, normalFromObject.dot(H)), o->getPC());
-    float LRs = (o->getKS() * o->getSC()(0)) * maxS;
+    /*float LRs = (o->getKS() * o->getSC()(0)) * maxS;
     float LGs = (o->getKS() * o->getSC()(1)) * maxS;
-    float LBs = (o->getKS() * o->getSC()(2)) * maxS;
+    float LBs = (o->getKS() * o->getSC()(2)) * maxS;*/
+    RGB IS(o->getKS() * o->getSC()(0), o->getKS() * o->getSC()(1), o->getKS() * o->getSC()(2));
+    IS *= maxS;
 
-    LR += IR * (LRd + LRs);
+    RGB L = IL * (ID + IS);
+
+    /*LR += IR * (LRd + LRs);
     LG += IG * (LGd + LGs);
-    LB += IB * (LBd + LBs);
+    LB += IB * (LBd + LBs);*/
 
-    return Eigen::Vector3f(0.0, 0.0, 0.0);
+    return L;
 }

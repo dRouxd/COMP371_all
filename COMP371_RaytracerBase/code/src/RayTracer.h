@@ -11,6 +11,8 @@
 
 #include <vector>
 
+class RGB;
+
 class RayTracer
 {
 public:
@@ -29,7 +31,7 @@ private:
     void calcRayColor(Ray* ray, GeometricObject* o, float oDist, Output* out);
     void calcRayColorLocal(Ray* ray, GeometricObject* o, float oDist, Output* out);
     void calcRayColorGlobal(Ray* ray, GeometricObject* o, float oDist, Output* out);
-    Eigen::Vector3f calcBSDF(Eigen::Vector3f p, Ray* ray, GeometricObject* o, LightObject* l, float& LR, float& LG, float& LB);
+    RGB calcBSDF(Eigen::Vector3f p, Ray* ray, GeometricObject* o, LightObject* l);
 
     std::vector<GeometricObject*> geometricObjects;
     std::vector<LightObject*> lightObjects;
