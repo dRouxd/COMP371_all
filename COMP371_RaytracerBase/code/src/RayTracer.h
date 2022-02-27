@@ -4,6 +4,7 @@
 #include "SphereObject.h"
 #include "RectangleObject.h"
 #include "LightObject.h"
+#include "Rectangle.h"
 #include "Output.h"
 #include "Ray.h"
 
@@ -12,6 +13,7 @@
 #include <vector>
 
 class RGB;
+class Rectangle;
 
 class RayTracer
 {
@@ -27,7 +29,7 @@ private:
     
     GeometricObject* rayIntersectObjects(Ray* ray, float& dist);
     float rayIntersectSphere(Ray* ray, SphereObject* so);
-    float rayIntersectRect(Ray* ray, RectangleObject* ro);
+    float rayIntersectRect(Ray* ray, Rectangle* ro);
     void calcRayColor(Ray* ray, GeometricObject* o, float oDist, Output* out);
     void calcRayColorLocal(Ray* ray, GeometricObject* o, float oDist, Output* out);
     void calcRayColorGlobal(Ray* ray, GeometricObject* o, float oDist, Output* out);

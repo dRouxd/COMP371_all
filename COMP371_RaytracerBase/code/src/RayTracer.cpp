@@ -1,8 +1,6 @@
 
 #include "RayTracer.h"
 
-#include "RectangleObject.h"
-#include "SphereObject.h"
 #include "PointObject.h"
 #include "AreaObject.h"
 #include "util.hpp"
@@ -184,10 +182,11 @@ float RayTracer::rayIntersectSphere(Ray* ray, SphereObject* so)
 
 }
 
-float RayTracer::rayIntersectRect(Ray* ray, RectangleObject* ro)
+float RayTracer::rayIntersectRect(Ray* ray, Rectangle* r)
 {
-    Eigen::Vector3f N = ro->getNormal();
     float dist = -1.0;
+
+    Eigen::Vector3f N = r->getNormal();
     
     float a = N.dot(ray->getDirection());
 
@@ -195,7 +194,7 @@ float RayTracer::rayIntersectRect(Ray* ray, RectangleObject* ro)
     if (std::fpclassify(fabs(a)) == FP_ZERO)
         return dist;
 
-    float t = N.dot(ro->getP1() - ray->getOrigin()) / a;
+    float t = N.dot(r->getP1() - ray->getOrigin()) / a;
 
     // Is the plane behind the ray?
     if(t < 0)
@@ -204,15 +203,15 @@ float RayTracer::rayIntersectRect(Ray* ray, RectangleObject* ro)
     Eigen::Vector3f p = ray->getOrigin() + t * ray->getDirection();
 
     // Is the point inside the rectangle?
-    Eigen::Vector3f e1 = ro->getP2() - ro->getP1();
-    Eigen::Vector3f e2 = ro->getP3() - ro->getP2();
-    Eigen::Vector3f e3 = ro->getP4() - ro->getP3();
-    Eigen::Vector3f e4 = ro->getP1() - ro->getP4();
+    Eigen::Vector3f e1 = r->getP2() - r->getP1();
+    Eigen::Vector3f e2 = r->getP3() - r->getP2();
+    Eigen::Vector3f e3 = r->getP4() - r->getP3();
+    Eigen::Vector3f e4 = r->getP1() - r->getP4();
 
-    Eigen::Vector3f c1 = p - ro->getP1();
-    Eigen::Vector3f c2 = p - ro->getP2();
-    Eigen::Vector3f c3 = p - ro->getP3();
-    Eigen::Vector3f c4 = p - ro->getP4();
+    Eigen::Vector3f c1 = p - r->getP1();
+    Eigen::Vector3f c2 = p - r->getP2();
+    Eigen::Vector3f c3 = p - r->getP3();
+    Eigen::Vector3f c4 = p - r->getP4();
 
     if( N.dot(e1.cross(c1)) > 0 &&
         N.dot(e2.cross(c2)) > 0 &&

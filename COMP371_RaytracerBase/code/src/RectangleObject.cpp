@@ -3,36 +3,20 @@
 
 #include "util.hpp"
 
-#include <Eigen/Geometry>
-
 RectangleObject::RectangleObject(std::string comment, RGB ac, RGB dc, RGB sc,
                     float ka, float kd, float ks, float pc, 
                     Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, Eigen::Vector3f p4):
-                    GeometricObject(ObjectType::Rectangle, comment, ac, dc, sc, ka, kd, ks, pc)
+                    GeometricObject(ObjectType::Rectangle, comment, ac, dc, sc, ka, kd, ks, pc),
+                    Rectangle(p1, p2, p3, p4)
 {
-    this->p1 = p1;
-    this->p2 = p2;
-    this->p3 = p3;
-    this->p4 = p4;
-    calcNormal();
 }
 
-RectangleObject::RectangleObject(nlohmann::json j) : GeometricObject(j)
+RectangleObject::RectangleObject(nlohmann::json j) : GeometricObject(j), Rectangle(j)
 {
-    this->p1 = JsonArrayToVector3f(j["p1"]);
-    this->p2 = JsonArrayToVector3f(j["p2"]);
-    this->p3 = JsonArrayToVector3f(j["p3"]);
-    this->p4 = JsonArrayToVector3f(j["p4"]);
-    calcNormal();
 }
 
-RectangleObject::RectangleObject(const RectangleObject& ro) : GeometricObject(ro)
+RectangleObject::RectangleObject(const RectangleObject& ro) : GeometricObject(ro), Rectangle(ro)
 {
-    this->p1 = Eigen::Vector3f(ro.p1);
-    this->p2 = Eigen::Vector3f(ro.p2);
-    this->p3 = Eigen::Vector3f(ro.p3);
-    this->p4 = Eigen::Vector3f(ro.p4);
-    calcNormal();
 }
 
 void RectangleObject::print()
@@ -48,9 +32,4 @@ void RectangleObject::print()
         << " p4:" << PrintVector3fStrOneLine(this->p4)
         << " normal:" << PrintVector3fStrOneLine(this->normal)
         << "]";
-}
-
-void RectangleObject::calcNormal()
-{
-    this->normal = (p2 - p1).cross(p3 - p1).normalized();
 }

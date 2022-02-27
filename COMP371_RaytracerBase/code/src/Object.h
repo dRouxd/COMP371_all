@@ -5,7 +5,7 @@
 
 #include <string>
 
-enum ObjectType{Sphere = 0, Rectangle = 1, Point = 2, Area = 3};
+enum class ObjectType{Sphere = 0, Rectangle = 1, Point = 2, Area = 3};
 
 class Object
 {

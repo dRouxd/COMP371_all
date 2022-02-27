@@ -80,14 +80,14 @@ GeometricObject* CreateGeometricObjectFromJson(nlohmann::json j)
 
     ObjectType type = StringToObjectType(j["type"].get<std::string>());
 
-    if(type != Rectangle && type != Sphere)
+    if(type != ObjectType::Rectangle && type != ObjectType::Sphere)
         throw std::runtime_error("CreateGeometricObjectFromJson: Passed json is not a geometric object");
 
     GeometricObject* go;
 
-    if(type == Rectangle)
+    if(type == ObjectType::Rectangle)
         go = new RectangleObject(j);
-    else if(type == Sphere)
+    else if(type == ObjectType::Sphere)
         go = new SphereObject(j);
 
     return go;
@@ -100,14 +100,14 @@ LightObject* CreateLightObjectFromJson(nlohmann::json j)
 
     ObjectType type = StringToObjectType(j["type"].get<std::string>());
 
-    if(type != Point && type != Area)
+    if(type != ObjectType::Point && type != ObjectType::Area)
         throw std::runtime_error("CreateGeometricObjectFromJson: Passed json is not a geometric object");
 
     LightObject* lo;
     
-    if(type == Point)
+    if(type == ObjectType::Point)
         lo = new PointObject(j);
-    else if(type == Area)
+    else if(type == ObjectType::Area)
         lo = new AreaObject(j);
 
     return lo;
