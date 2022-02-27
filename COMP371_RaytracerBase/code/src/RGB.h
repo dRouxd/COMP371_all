@@ -9,16 +9,18 @@ public:
     RGB();
     RGB(float r, float g, float b);
     RGB(const RGB& rgb);
+    void clamp(float min = 0.0f, float max = 1.0f);
+
+    inline float getR() const { return r; };
+    inline float getG() const { return g; };
+    inline float getB() const { return b; };
+
     RGB& operator=(const RGB& rgb);
     RGB& operator+=(const RGB& rgb);
     RGB& operator*=(const RGB& rgb);
     RGB& operator*=(float s);
     float& operator()(int i);
     float operator()(int i) const;
-
-    inline float getR() const { return r; };
-    inline float getG() const { return g; };
-    inline float getB() const { return b; };
 
 private:
     float r;

@@ -1,16 +1,16 @@
 #ifndef SPHEREOBJECT_H
 #define SPHEREOBJECT_H
 
-#include "GeometricObject.h"
+#include "Geometric.h"
 
-class SphereObject : public GeometricObject
+class SphereGeom : public Geometric
 {
 public:
-    SphereObject(std::string comment, RGB ac, RGB dc, RGB sc,
+    SphereGeom(std::string comment, RGB ac, RGB dc, RGB sc,
                     float ka, float kd, float ks, float pc, Eigen::Vector3f centre, float radius);
-    SphereObject(nlohmann::json j);
-    SphereObject(const SphereObject& so);
-    ~SphereObject() = default;
+    SphereGeom(nlohmann::json j);
+    SphereGeom(const SphereGeom& so);
+    ~SphereGeom() = default;
     void print();
 
     inline Eigen::Vector3f getCentre() const { return centre; };

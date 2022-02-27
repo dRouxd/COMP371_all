@@ -10,14 +10,15 @@
 
 class RGB;
 
-class LightObject : public Object
+class Light : public Object
 {
 public:
-    LightObject(ObjectType type, RGB id, RGB is);
-    LightObject(nlohmann::json j);
-    LightObject(const LightObject& lo);
-    virtual ~LightObject() = default;
+    Light(ObjectType type, RGB id, RGB is);
+    Light(nlohmann::json j);
+    Light(const Light& lo);
+    virtual ~Light() = default;
     virtual void print() = 0;
+    RGB getLightColor() const;
 
     inline RGB getID() const { return id; };
     inline RGB getIS() const { return is; };

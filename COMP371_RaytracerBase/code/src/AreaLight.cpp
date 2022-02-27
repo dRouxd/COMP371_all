@@ -1,25 +1,25 @@
 
-#include "AreaObject.h"
+#include "AreaLight.h"
 
 #include "util.hpp"
 
-AreaObject::AreaObject(ObjectType type, RGB id, RGB is, 
+AreaLight::AreaLight(ObjectType type, RGB id, RGB is, 
                 Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, Eigen::Vector3f p4): 
-                LightObject(type, id, is), Rectangle(p1, p2, p3, p4)
+                Light(type, id, is), Rectangle(p1, p2, p3, p4)
 {
 }
 
-AreaObject::AreaObject(nlohmann::json j) : LightObject(j), Rectangle(j)
+AreaLight::AreaLight(nlohmann::json j) : Light(j), Rectangle(j)
 {
 }
 
-AreaObject::AreaObject(const AreaObject& ao) : LightObject(ao), Rectangle(ao)
+AreaLight::AreaLight(const AreaLight& ao) : Light(ao), Rectangle(ao)
 {
 }
 
-void AreaObject::print()
+void AreaLight::print()
 {
-    std::cout << "[AREAOBJECT"
+    std::cout << "[AreaLight"
         << " id:" << this->id
         << " is:" << this->is
         << " p1:" << PrintVector3fStrOneLine(this->p1)

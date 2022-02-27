@@ -1,9 +1,9 @@
 #include "util.hpp"
 
-#include "RectangleObject.h"
-#include "SphereObject.h"
-#include "PointObject.h"
-#include "AreaObject.h"
+#include "RectangleGeom.h"
+#include "SphereGeom.h"
+#include "PointLight.h"
+#include "AreaLight.h"
 
 #include <Eigen/Geometry>
 
@@ -73,7 +73,7 @@ RGB JsonArrayToRGB(nlohmann::json j)
     return RGB(elems[0], elems[1], elems[2]);
 }
 
-GeometricObject* CreateGeometricObjectFromJson(nlohmann::json j)
+Geometric* CreateGeometricObjectFromJson(nlohmann::json j)
 {
     if(j.count("type") != 1)
         throw std::runtime_error("CreateGeometricObjectFromJson: Passed json does not contain type");
@@ -83,17 +83,17 @@ GeometricObject* CreateGeometricObjectFromJson(nlohmann::json j)
     if(type != ObjectType::Rectangle && type != ObjectType::Sphere)
         throw std::runtime_error("CreateGeometricObjectFromJson: Passed json is not a geometric object");
 
-    GeometricObject* go;
+    Geometric* go;
 
     if(type == ObjectType::Rectangle)
-        go = new RectangleObject(j);
+        go = new RectangleGeom(j);
     else if(type == ObjectType::Sphere)
-        go = new SphereObject(j);
+        go = new SphereGeom(j);
 
     return go;
 }
 
-LightObject* CreateLightObjectFromJson(nlohmann::json j)
+Light* CreateLightObjectFromJson(nlohmann::json j)
 {
     if(j.count("type") != 1)
         throw std::runtime_error("CreateGeometricObjectFromJson: Passed json does not contain type");
@@ -103,12 +103,12 @@ LightObject* CreateLightObjectFromJson(nlohmann::json j)
     if(type != ObjectType::Point && type != ObjectType::Area)
         throw std::runtime_error("CreateGeometricObjectFromJson: Passed json is not a geometric object");
 
-    LightObject* lo;
+    Light* lo;
     
     if(type == ObjectType::Point)
-        lo = new PointObject(j);
+        lo = new PointLight(j);
     else if(type == ObjectType::Area)
-        lo = new AreaObject(j);
+        lo = new AreaLight(j);
 
     return lo;
 }

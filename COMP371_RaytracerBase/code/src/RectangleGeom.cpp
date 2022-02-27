@@ -1,27 +1,27 @@
 
-#include "RectangleObject.h"
+#include "RectangleGeom.h"
 
 #include "util.hpp"
 
-RectangleObject::RectangleObject(std::string comment, RGB ac, RGB dc, RGB sc,
+RectangleGeom::RectangleGeom(std::string comment, RGB ac, RGB dc, RGB sc,
                     float ka, float kd, float ks, float pc, 
                     Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, Eigen::Vector3f p4):
-                    GeometricObject(ObjectType::Rectangle, comment, ac, dc, sc, ka, kd, ks, pc),
+                    Geometric(ObjectType::Rectangle, comment, ac, dc, sc, ka, kd, ks, pc),
                     Rectangle(p1, p2, p3, p4)
 {
 }
 
-RectangleObject::RectangleObject(nlohmann::json j) : GeometricObject(j), Rectangle(j)
+RectangleGeom::RectangleGeom(nlohmann::json j) : Geometric(j), Rectangle(j)
 {
 }
 
-RectangleObject::RectangleObject(const RectangleObject& ro) : GeometricObject(ro), Rectangle(ro)
+RectangleGeom::RectangleGeom(const RectangleGeom& ro) : Geometric(ro), Rectangle(ro)
 {
 }
 
-void RectangleObject::print()
+void RectangleGeom::print()
 {
-    std::cout << "[RECTANGLEOBJECT"
+    std::cout << "[RectangleGeom"
         << " ac:" << this->ac
         << " dc:" << this->dc
         << " sc:" << this->sc

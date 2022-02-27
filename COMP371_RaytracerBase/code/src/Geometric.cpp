@@ -1,9 +1,9 @@
 
-#include "GeometricObject.h"
+#include "Geometric.h"
 
 #include "util.hpp"
 
-GeometricObject::GeometricObject(ObjectType type, std::string comment, RGB ac, RGB dc, RGB sc,
+Geometric::Geometric(ObjectType type, std::string comment, RGB ac, RGB dc, RGB sc,
                                 float ka, float kd, float ks,
                                 float pc) : Object(type)
 {
@@ -21,7 +21,7 @@ GeometricObject::GeometricObject(ObjectType type, std::string comment, RGB ac, R
     this->comment = comment;
 }
 
-GeometricObject::GeometricObject(nlohmann::json j) : Object(j)
+Geometric::Geometric(nlohmann::json j) : Object(j)
 {
 
     this->ac = JsonArrayToRGB(j["ac"]);
@@ -38,7 +38,7 @@ GeometricObject::GeometricObject(nlohmann::json j) : Object(j)
     this->comment = j.contains(std::string("comment")) ? j["comment"].get<std::string>() : std::string("");
 }
 
-GeometricObject::GeometricObject(const GeometricObject& go) : Object(go)
+Geometric::Geometric(const Geometric& go) : Object(go)
 {
     this->ac = RGB(go.ac);
     this->dc = RGB(go.dc);

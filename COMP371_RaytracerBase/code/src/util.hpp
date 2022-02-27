@@ -1,8 +1,8 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
-#include "GeometricObject.h"
-#include "LightObject.h"
+#include "Geometric.h"
+#include "Light.h"
 #include "Ray.h"
 #include "Camera.h"
 #include "RGB.h"
@@ -21,9 +21,9 @@ Eigen::Vector3f JsonArrayToVector3f(nlohmann::json j);
 
 RGB JsonArrayToRGB(nlohmann::json j);
 
-GeometricObject* CreateGeometricObjectFromJson(nlohmann::json j);
+Geometric* CreateGeometricObjectFromJson(nlohmann::json j);
 
-LightObject* CreateLightObjectFromJson(nlohmann::json j);
+Light* CreateLightObjectFromJson(nlohmann::json j);
 
 Ray* CreateRayFromCamera(Camera* camera, int x, int y);
 

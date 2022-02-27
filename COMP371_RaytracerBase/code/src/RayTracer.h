@@ -1,9 +1,9 @@
 #ifndef RAYTRACER_H
 #define RAYTRACER_H
 
-#include "SphereObject.h"
-#include "RectangleObject.h"
-#include "LightObject.h"
+#include "SphereGeom.h"
+#include "RectangleGeom.h"
+#include "Light.h"
 #include "Rectangle.h"
 #include "Output.h"
 #include "Ray.h"
@@ -27,16 +27,16 @@ private:
 
     void outputBufferToPPM(std::string outputFilename, Eigen::Vector3f** buf, unsigned int w, unsigned int h);
     
-    GeometricObject* rayIntersectObjects(Ray* ray, float& dist);
-    float rayIntersectSphere(Ray* ray, SphereObject* so);
+    Object* rayIntersectObjects(Ray* ray, float& dist);
+    float rayIntersectSphere(Ray* ray, SphereGeom* so);
     float rayIntersectRect(Ray* ray, Rectangle* ro);
-    void calcRayColor(Ray* ray, GeometricObject* o, float oDist, Output* out);
-    void calcRayColorLocal(Ray* ray, GeometricObject* o, float oDist, Output* out);
-    void calcRayColorGlobal(Ray* ray, GeometricObject* o, float oDist, Output* out);
-    RGB calcBSDF(Eigen::Vector3f p, Ray* ray, GeometricObject* o);
+    void calcRayColor(Ray* ray, Object* o, float oDist, Output* out);
+    void calcRayColorLocal(Ray* ray, Object* o, float oDist, Output* out);
+    void calcRayColorGlobal(Ray* ray, Object* o, float oDist, Output* out);
+    RGB calcBSDF(Eigen::Vector3f p, Ray* ray, Geometric* o);
 
-    std::vector<GeometricObject*> geometricObjects;
-    std::vector<LightObject*> lightObjects;
+    std::vector<Geometric*> geometricObjects;
+    std::vector<Light*> lightObjects;
     std::vector<Output*> outputs;
 
 };

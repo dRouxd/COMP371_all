@@ -11,14 +11,14 @@
 
 class RGB;
 
-class GeometricObject : public Object
+class Geometric : public Object
 {
 public:
-    GeometricObject(ObjectType type, std::string comment, RGB ac, RGB dc, RGB sc,
+    Geometric(ObjectType type, std::string comment, RGB ac, RGB dc, RGB sc,
                     float ka, float kd, float ks, float pc);
-    GeometricObject(nlohmann::json j);
-    GeometricObject(const GeometricObject& go);
-    virtual ~GeometricObject() = default;
+    Geometric(nlohmann::json j);
+    Geometric(const Geometric& go);
+    virtual ~Geometric() = default;
     virtual void print() = 0;
 
     inline RGB getAC() const { return ac; };

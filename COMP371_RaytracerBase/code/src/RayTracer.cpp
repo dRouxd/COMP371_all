@@ -1,8 +1,8 @@
 
 #include "RayTracer.h"
 
-#include "PointObject.h"
-#include "AreaObject.h"
+#include "PointLight.h"
+#include "AreaLight.h"
 #include "util.hpp"
 #include "RGB.h"
 
@@ -19,14 +19,14 @@ RayTracer::RayTracer(nlohmann::json j)
     nlohmann::json geometries = j["geometry"];
     for(auto it = geometries.begin(); it != geometries.end(); ++it)
     {
-        GeometricObject* go = CreateGeometricObjectFromJson(it.value());
+        Geometric* go = CreateGeometricObjectFromJson(it.value());
         this->geometricObjects.push_back(go);
     }
 
     nlohmann::json lights = j["light"];
     for(auto it = lights.begin(); it != lights.end(); ++it)
     {
-        LightObject* lo = CreateLightObjectFromJson(it.value());
+        Light* lo = CreateLightObjectFromJson(it.value());
         this->lightObjects.push_back(lo);
     }
 
@@ -81,7 +81,7 @@ void RayTracer::run()
 
                 // Check if the ray hits any objects
                 float distToHit = -1.0f;
-                GeometricObject* oHit = rayIntersectObjects(r, distToHit);
+                Object* oHit = rayIntersectObjects(r, distToHit);
                 if(oHit)
                 {
                     calcRayColor(r, oHit, distToHit, currentOut);
@@ -119,24 +119,24 @@ void RayTracer::outputBufferToPPM(std::string outputFilename, Eigen::Vector3f** 
     ofs.close();
 }
 
-GeometricObject* RayTracer::rayIntersectObjects(Ray* ray, float& dist)
+Object* RayTracer::rayIntersectObjects(Ray* ray, float& dist)
 {
-    GeometricObject* closestObject = NULL;
+    Object* closestObject = NULL;
     float closestDist = -1.0;
 
-    // Find the first object which is hit by the ray
+    // Find the first object or light which is hit by the ray
     for(auto o : this->geometricObjects)
     {
         float distToObject = -1.0;
         if(o->getType() == ObjectType::Sphere)
         {
-            SphereObject* so = dynamic_cast<SphereObject*>(o);
+            SphereGeom* so = dynamic_cast<SphereGeom*>(o);
             distToObject = rayIntersectSphere(ray, so);
         }
 
         if(o->getType() == ObjectType::Rectangle)
         {
-            RectangleObject* ro = dynamic_cast<RectangleObject*>(o);
+            RectangleGeom* ro = dynamic_cast<RectangleGeom*>(o);
             distToObject = rayIntersectRect(ray, ro);
         }
         
@@ -147,11 +147,27 @@ GeometricObject* RayTracer::rayIntersectObjects(Ray* ray, float& dist)
         }
     }
 
+    for(auto l : this->lightObjects)
+    {
+        float distToObject = -1.0;
+        if(l->getType() == ObjectType::Area)
+        {
+            AreaLight* al = dynamic_cast<AreaLight*>(l);
+            distToObject = rayIntersectRect(ray, al);
+        }
+        
+        if(distToObject >= 0 && (!closestObject || distToObject < closestDist))
+        {
+            closestObject = l;
+            closestDist = distToObject;
+        }
+    }
+
     dist = closestDist;
     return closestObject;
 }
 
-float RayTracer::rayIntersectSphere(Ray* ray, SphereObject* so)
+float RayTracer::rayIntersectSphere(Ray* ray, SphereGeom* so)
 {
     float dist = -1.0;
 
@@ -222,7 +238,7 @@ float RayTracer::rayIntersectRect(Ray* ray, Rectangle* r)
     return dist;
 }
 
-void RayTracer::calcRayColor(Ray* ray, GeometricObject* o, float oDist, Output* out)
+void RayTracer::calcRayColor(Ray* ray, Object* o, float oDist, Output* out)
 {
     if(out->getGlobalIllum())
         calcRayColorGlobal(ray, o, oDist, out);
@@ -230,40 +246,54 @@ void RayTracer::calcRayColor(Ray* ray, GeometricObject* o, float oDist, Output* 
         calcRayColorLocal(ray, o, oDist, out);
 }
 
-void RayTracer::calcRayColorLocal(Ray* ray, GeometricObject* o, float oDist, Output* out)
+void RayTracer::calcRayColorLocal(Ray* ray, Object* o, float oDist, Output* out)
 {
     // Offset by small value to remove numerical imprecision.
     Eigen::Vector3f point = ray->getOrigin() + (oDist - 0.001) * ray->getDirection();
 
+    // If the ray hits the area light, get the light value directly
+    if(o->getType() == ObjectType::Area)
+    {
+        AreaLight* al = dynamic_cast<AreaLight*>(o);
+        RGB c(al->getLightColor());
+        c.clamp();
+
+        ray->setColor(c);
+        return;
+    }else if(o->getType() == ObjectType::Point)
+    {
+        return;
+    }
+
+    Geometric* geom = dynamic_cast<Geometric*>(o);
+
     // Ambiant component
-    RGB L(o->getKA() * o->getAC()(0) * out->getAI()(0), 
-            o->getKA() * o->getAC()(1) * out->getAI()(0), 
-            o->getKA() * o->getAC()(2) * out->getAI()(0));
+    RGB L(geom->getKA() * geom->getAC()(0) * out->getAI()(0), 
+            geom->getKA() * geom->getAC()(1) * out->getAI()(0), 
+            geom->getKA() * geom->getAC()(2) * out->getAI()(0));
 
-    L += calcBSDF(point, ray, o);
-
+    L += calcBSDF(point, ray, geom);
+    
     // Clamp light value between 0 and 1
-    L(0) = std::max(std::min(L(0), 1.0f), 0.0f);
-    L(1) = std::max(std::min(L(1), 1.0f), 0.0f);
-    L(2) = std::max(std::min(L(2), 1.0f), 0.0f);
+    L.clamp();
 
     ray->setColor(L);
 }
 
-void RayTracer::calcRayColorGlobal(Ray* ray, GeometricObject* o, float oDist, Output* out)
+void RayTracer::calcRayColorGlobal(Ray* ray, Object* o, float oDist, Output* out)
 {
     
 }
 
-RGB RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, GeometricObject* o)
+RGB RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, Geometric* o)
 {
     Eigen::Vector3f normalFromObject;
     if(o->getType() == ObjectType::Rectangle)
     {
-        normalFromObject = dynamic_cast<RectangleObject*>(o)->getNormal();
+        normalFromObject = dynamic_cast<RectangleGeom*>(o)->getNormal();
     } else
     {
-        normalFromObject = CreateNormalFrom2Points(dynamic_cast<SphereObject*>(o)->getCentre(), p);
+        normalFromObject = CreateNormalFrom2Points(dynamic_cast<SphereGeom*>(o)->getCentre(), p);
     }
 
     if(normalFromObject.dot(r->getDirection()) > 0)
@@ -275,25 +305,33 @@ RGB RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, GeometricObject* o)
     for(auto l : this->lightObjects)
     {
         Eigen::Vector3f lightDirection;
+        
+        // I: Intensity of the light
+        RGB IL(l->getLightColor());
 
         // TODO: if point light, keep that, otherwise do monte carlo integration on area light
         if(l->getType() == ObjectType::Point)
         {
-            PointObject* po = dynamic_cast<PointObject*>(l);
+            PointLight* po = dynamic_cast<PointLight*>(l);
             lightDirection = CreateNormalFrom2Points(p, po->getCentre());
             
             // Check if there's any objects in the path of to the light
             Ray* rayToLight = new Ray(p, lightDirection);
             float distToObs = -1.0f;
-            GeometricObject* lightObstructed = rayIntersectObjects(rayToLight, distToObs);
+            Object* lightObstructed = rayIntersectObjects(rayToLight, distToObs);
             delete rayToLight;
             
             if(lightObstructed && distToObs < GetDistanceBetween2Points(p, po->getCentre()))
-                continue;
+            {
+                // If the obstructed object is an area light, use the area light intensity for the calculations
+                if(lightObstructed->getType() == ObjectType::Area)
+                {
+                    AreaLight* al = dynamic_cast<AreaLight*>(lightObstructed);
+                    IL = al->getLightColor();
+                }else
+                    continue;
+            }
         }
-        
-        // I: Intensity of the light
-        RGB IL(l->getIS() * l->getID());
 
         // Diffuse component of the color value
         float maxD = std::max(0.0f, normalFromObject.dot(lightDirection));

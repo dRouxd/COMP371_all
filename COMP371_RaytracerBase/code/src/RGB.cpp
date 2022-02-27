@@ -2,6 +2,7 @@
 #include "RGB.h"
 
 #include <stdexcept>
+#include <cmath>
 
 RGB::RGB()
 {
@@ -22,6 +23,13 @@ RGB::RGB(const RGB& rgb)
     this->r = rgb.r;
     this->g = rgb.g;
     this->b = rgb.b;
+}
+
+void RGB::clamp(float min, float max)
+{
+    this->r = std::max(std::min(max, this->r), min);
+    this->g = std::max(std::min(max, this->g), min);
+    this->b = std::max(std::min(max, this->b), min);
 }
 
 RGB& RGB::operator=(const RGB& rgb)
