@@ -29,7 +29,6 @@ private:
     
     Object* rayIntersectObjects(Ray* ray, float& dist);
     float rayIntersectSphere(Ray* ray, SphereGeom* so);
-    float rayIntersectRect(Ray* ray, Rectangle* ro);
     void calcRayColor(Ray* ray, Object* o, float oDist, Output* out);
     void calcRayColorLocal(Ray* ray, Object* o, float oDist, Output* out);
     void calcRayColorGlobal(Ray* ray, Object* o, float oDist, Output* out);

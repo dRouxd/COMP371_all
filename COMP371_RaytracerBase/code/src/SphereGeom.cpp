@@ -23,10 +23,40 @@ SphereGeom::SphereGeom(const SphereGeom& so) : Geometric(so)
     this->radius = so.radius;
 }
 
-Eigen::Vector3f SphereGeom::getNormalFromPointOnSphere(Eigen::Vector3f point) const
+float SphereGeom::rayIntersect(Ray* ray)
 {
-    // TODO: Calculate the normal using the center of the sphere and the given point
-    return Eigen::Vector3f(1.0, 1.0, 1.0);
+    float dist = -1.0;
+
+    Eigen::Vector3f L = this->centre - ray->getOrigin();
+    float ld = L.dot(ray->getDirection());
+    if(ld < 0)
+        return dist;
+
+    float lld = sqrt(L.dot(L) - ld * ld);
+    if(lld >= this->radius)
+        return dist;
+
+    float rlld = sqrt(pow(this->radius, 2) - lld*lld);
+
+    // Sphere intersection points
+    float t0 = ld - rlld;
+    float t1 = ld + rlld;
+
+    // If sphere is ahead of camera
+    if(t0 > 0 && t1 > 0)
+        dist = t0;
+
+    // If camera is in sphere
+    else if(t0 < 0 && t1 > 0)
+        dist = t1;
+
+    return dist;
+
+}
+
+Eigen::Vector3f SphereGeom::getNormalFromPointOnSphere(Eigen::Vector3f p) const
+{
+    return CreateNormalFrom2Points(this->centre, p);
 }
 
 void SphereGeom::print()

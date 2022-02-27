@@ -2,6 +2,7 @@
 #define SPHEREOBJECT_H
 
 #include "Geometric.h"
+#include "Ray.h"
 
 class SphereGeom : public Geometric
 {
@@ -13,10 +14,12 @@ public:
     ~SphereGeom() = default;
     void print();
 
+    float rayIntersect(Ray* ray);
+
     inline Eigen::Vector3f getCentre() const { return centre; };
     inline float getRadius() const { return radius; };
 
-    Eigen::Vector3f getNormalFromPointOnSphere(Eigen::Vector3f point) const;
+    Eigen::Vector3f getNormalFromPointOnSphere(Eigen::Vector3f p) const;
 
 private:
     Eigen::Vector3f centre;

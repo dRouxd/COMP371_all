@@ -1,6 +1,8 @@
 #ifndef RECTANGLE_H
 #define RECTANGLE_H
 
+#include "Ray.h"
+
 #include "json.hpp"
 
 #include <Eigen/Core>
@@ -12,6 +14,8 @@ public:
     Rectangle(nlohmann::json j);
     Rectangle(const Rectangle& r);
     ~Rectangle() = default;
+
+    float rayIntersect(Ray* ray);
 
     inline Eigen::Vector3f getP1() const { return p1; };
     inline Eigen::Vector3f getP2() const { return p2; };

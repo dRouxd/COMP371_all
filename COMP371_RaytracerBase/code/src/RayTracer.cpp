@@ -131,13 +131,13 @@ Object* RayTracer::rayIntersectObjects(Ray* ray, float& dist)
         if(o->getType() == ObjectType::Sphere)
         {
             SphereGeom* so = dynamic_cast<SphereGeom*>(o);
-            distToObject = rayIntersectSphere(ray, so);
+            distToObject = so->rayIntersect(ray);
         }
 
         if(o->getType() == ObjectType::Rectangle)
         {
             RectangleGeom* ro = dynamic_cast<RectangleGeom*>(o);
-            distToObject = rayIntersectRect(ray, ro);
+            distToObject = ro->rayIntersect(ray);
         }
         
         if(distToObject >= 0 && (!closestObject || distToObject < closestDist))
@@ -153,7 +153,7 @@ Object* RayTracer::rayIntersectObjects(Ray* ray, float& dist)
         if(l->getType() == ObjectType::Area)
         {
             AreaLight* al = dynamic_cast<AreaLight*>(l);
-            distToObject = rayIntersectRect(ray, al);
+            distToObject = al->rayIntersect(ray);
         }
         
         if(distToObject >= 0 && (!closestObject || distToObject < closestDist))
@@ -165,77 +165,6 @@ Object* RayTracer::rayIntersectObjects(Ray* ray, float& dist)
 
     dist = closestDist;
     return closestObject;
-}
-
-float RayTracer::rayIntersectSphere(Ray* ray, SphereGeom* so)
-{
-    float dist = -1.0;
-
-    Eigen::Vector3f L = so->getCentre() - ray->getOrigin();
-    float ld = L.dot(ray->getDirection());
-    if(ld < 0)
-        return dist;
-
-    float lld = sqrt(L.dot(L) - ld * ld);
-    if(lld >= so->getRadius())
-        return dist;
-
-    float rlld = sqrt(pow(so->getRadius(), 2) - lld*lld);
-
-    // Sphere intersection points
-    float t0 = ld - rlld;
-    float t1 = ld + rlld;
-
-    // If sphere is ahead of camera
-    if(t0 > 0 && t1 > 0)
-        dist = t0;
-
-    // If camera is in sphere
-    else if(t0 < 0 && t1 > 0)
-        dist = t1;
-
-    return dist;
-
-}
-
-float RayTracer::rayIntersectRect(Ray* ray, Rectangle* r)
-{
-    float dist = -1.0;
-
-    Eigen::Vector3f N = r->getNormal();
-    
-    float a = N.dot(ray->getDirection());
-
-    // Is the ray and the plane parallel?
-    if (std::fpclassify(fabs(a)) == FP_ZERO)
-        return dist;
-
-    float t = N.dot(r->getP1() - ray->getOrigin()) / a;
-
-    // Is the plane behind the ray?
-    if(t < 0)
-        return dist;
-
-    Eigen::Vector3f p = ray->getOrigin() + t * ray->getDirection();
-
-    // Is the point inside the rectangle?
-    Eigen::Vector3f e1 = r->getP2() - r->getP1();
-    Eigen::Vector3f e2 = r->getP3() - r->getP2();
-    Eigen::Vector3f e3 = r->getP4() - r->getP3();
-    Eigen::Vector3f e4 = r->getP1() - r->getP4();
-
-    Eigen::Vector3f c1 = p - r->getP1();
-    Eigen::Vector3f c2 = p - r->getP2();
-    Eigen::Vector3f c3 = p - r->getP3();
-    Eigen::Vector3f c4 = p - r->getP4();
-
-    if( N.dot(e1.cross(c1)) > 0 &&
-        N.dot(e2.cross(c2)) > 0 &&
-        N.dot(e3.cross(c3)) > 0 &&
-        N.dot(e4.cross(c4)) > 0)
-        dist = t;
-
-    return dist;
 }
 
 void RayTracer::calcRayColor(Ray* ray, Object* o, float oDist, Output* out)
@@ -291,7 +220,7 @@ RGB RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, Geometric* o)
         normalFromObject = dynamic_cast<RectangleGeom*>(o)->getNormal();
     } else
     {
-        normalFromObject = CreateNormalFrom2Points(dynamic_cast<SphereGeom*>(o)->getCentre(), p);
+        normalFromObject = dynamic_cast<SphereGeom*>(o)->getNormalFromPointOnSphere(p);
     }
 
     if(normalFromObject.dot(r->getDirection()) > 0)
