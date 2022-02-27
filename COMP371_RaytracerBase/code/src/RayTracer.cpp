@@ -268,9 +268,7 @@ void RayTracer::calcRayColorLocal(Ray* ray, Object* o, float oDist, Output* out)
     Geometric* geom = dynamic_cast<Geometric*>(o);
 
     // Ambiant component
-    RGB L(geom->getKA() * geom->getAC()(0) * out->getAI()(0), 
-            geom->getKA() * geom->getAC()(1) * out->getAI()(0), 
-            geom->getKA() * geom->getAC()(2) * out->getAI()(0));
+    RGB L(geom->getAmbiantColor());
 
     L += calcBSDF(point, ray, geom);
     
@@ -335,14 +333,14 @@ RGB RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, Geometric* o)
 
         // Diffuse component of the color value
         float maxD = std::max(0.0f, normalFromObject.dot(lightDirection));
-        RGB ID(o->getKD() * o->getDC() * maxD);
+        RGB ID(o->getDiffuseColor() * maxD);
 
         // Specular component of the color value
         Eigen::Vector3f v = CreateNormalFrom2Points(p, r->getOrigin());
         Eigen::Vector3f R = (2.0f * normalFromObject * (normalFromObject.dot(lightDirection)) - lightDirection);
         Eigen::Vector3f H = (v + lightDirection).normalized();
         float maxS = std::pow(std::max(0.0f, normalFromObject.dot(H)), o->getPC());
-        RGB IS(o->getKS() * o->getSC() * maxS);
+        RGB IS(o->getSpecularColor() * maxS);
 
         L += IL * (ID + IS);
     }

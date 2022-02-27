@@ -20,8 +20,3 @@ Light::Light(const Light& lo) : Object(lo)
     this->id = RGB(lo.id);
     this->is = RGB(lo.is);
 }
-
-RGB Light::getLightColor() const
-{
-    return this->id * this->is;
-}

@@ -33,6 +33,10 @@ public:
 
     std::string getComment() const { return comment; };
 
+    inline RGB getAmbiantColor() const { return ac * ka; };
+    inline RGB getDiffuseColor() const { return dc * kd; };
+    inline RGB getSpecularColor() const { return sc * ks; };
+
 protected:
     RGB ac;
     RGB dc;

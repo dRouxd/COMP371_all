@@ -18,10 +18,11 @@ public:
     Light(const Light& lo);
     virtual ~Light() = default;
     virtual void print() = 0;
-    RGB getLightColor() const;
 
     inline RGB getID() const { return id; };
     inline RGB getIS() const { return is; };
+    
+    inline RGB getLightColor() const { return this->id * this->is; };
 
 protected:
     RGB id;
