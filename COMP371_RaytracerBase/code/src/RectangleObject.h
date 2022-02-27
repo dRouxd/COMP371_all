@@ -6,7 +6,7 @@
 class RectangleObject : public GeometricObject
 {
 public:
-    RectangleObject(std::string comment, Eigen::Vector3f ac, Eigen::Vector3f dc, Eigen::Vector3f sc,
+    RectangleObject(std::string comment, RGB ac, RGB dc, RGB sc,
                     float ka, float kd, float ks, float pc, 
                     Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, Eigen::Vector3f p4);
     RectangleObject(nlohmann::json j);
