@@ -125,10 +125,35 @@ RGB operator*(RGB rgb, float s)
     return rgb;
 }
 
+RGB operator*(int s, RGB rgb)
+{
+    rgb *= s;
+    return rgb;
+}
+
+RGB operator*(unsigned int s, RGB rgb)
+{
+    rgb *= s;
+    return rgb;
+}
+
+RGB operator*(float s, RGB rgb)
+{
+    rgb *= s;
+    return rgb;
+}
+
+
 RGB operator*(RGB rgb1, const RGB& rgb2)
 {
     rgb1.r *= rgb2.r;
     rgb1.g *= rgb2.g;
     rgb1.b *= rgb2.b;
     return rgb1;
+}
+
+std::ostream& operator<<(std::ostream& os, const RGB rgb)
+{
+    os << "[" << rgb.r << ", " << rgb.g << ", " << rgb.b << "]";
+    return os;
 }

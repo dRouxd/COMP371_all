@@ -3,7 +3,7 @@
 
 #include "util.hpp"
 
-GeometricObject::GeometricObject(ObjectType type, std::string comment, Eigen::Vector3f ac, Eigen::Vector3f dc, Eigen::Vector3f sc,
+GeometricObject::GeometricObject(ObjectType type, std::string comment, RGB ac, RGB dc, RGB sc,
                                 float ka, float kd, float ks,
                                 float pc) : Object(type)
 {
@@ -24,9 +24,9 @@ GeometricObject::GeometricObject(ObjectType type, std::string comment, Eigen::Ve
 GeometricObject::GeometricObject(nlohmann::json j) : Object(j)
 {
 
-    this->ac = JsonArrayToVector3f(j["ac"]);
-    this->dc = JsonArrayToVector3f(j["dc"]);
-    this->sc = JsonArrayToVector3f(j["sc"]);
+    this->ac = JsonArrayToRGB(j["ac"]);
+    this->dc = JsonArrayToRGB(j["dc"]);
+    this->sc = JsonArrayToRGB(j["sc"]);
 
     this->ka = j["ka"].get<float>();
     this->kd = j["kd"].get<float>();
@@ -40,9 +40,9 @@ GeometricObject::GeometricObject(nlohmann::json j) : Object(j)
 
 GeometricObject::GeometricObject(const GeometricObject& go) : Object(go)
 {
-    this->ac = Eigen::Vector3f(go.ac);
-    this->dc = Eigen::Vector3f(go.dc);
-    this->sc = Eigen::Vector3f(go.sc);
+    this->ac = RGB(go.ac);
+    this->dc = RGB(go.dc);
+    this->sc = RGB(go.sc);
     
     this->ka = go.ka;
     this->kd = go.kd;

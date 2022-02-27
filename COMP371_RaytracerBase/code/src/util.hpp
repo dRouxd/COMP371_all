@@ -5,6 +5,7 @@
 #include "LightObject.h"
 #include "Ray.h"
 #include "Camera.h"
+#include "RGB.h"
 
 #include "json.hpp"
 
@@ -17,6 +18,8 @@ const char* ObjectTypeToString(ObjectType type);
 ObjectType StringToObjectType(std::string type);
 
 Eigen::Vector3f JsonArrayToVector3f(nlohmann::json j);
+
+RGB JsonArrayToRGB(nlohmann::json j);
 
 GeometricObject* CreateGeometricObjectFromJson(nlohmann::json j);
 

@@ -2,25 +2,28 @@
 #define GEOMETRICOBJECT_H
 
 #include "Object.h"
+#include "RGB.h"
 
 #include <Eigen/Core>
 
 #include <iostream>
 #include <string>
 
+class RGB;
+
 class GeometricObject : public Object
 {
 public:
-    GeometricObject(ObjectType type, std::string comment, Eigen::Vector3f ac, Eigen::Vector3f dc, Eigen::Vector3f sc,
+    GeometricObject(ObjectType type, std::string comment, RGB ac, RGB dc, RGB sc,
                     float ka, float kd, float ks, float pc);
     GeometricObject(nlohmann::json j);
     GeometricObject(const GeometricObject& go);
     virtual ~GeometricObject() = default;
     virtual void print() = 0;
 
-    inline Eigen::Vector3f getAC() const { return ac; };
-    inline Eigen::Vector3f getDC() const { return dc; };
-    inline Eigen::Vector3f getSC() const { return sc; };
+    inline RGB getAC() const { return ac; };
+    inline RGB getDC() const { return dc; };
+    inline RGB getSC() const { return sc; };
 
     inline float getKA() const { return ka; };
     inline float getKD() const { return kd; };
@@ -31,9 +34,9 @@ public:
     std::string getComment() const { return comment; };
 
 protected:
-    Eigen::Vector3f ac;
-    Eigen::Vector3f dc;
-    Eigen::Vector3f sc;
+    RGB ac;
+    RGB dc;
+    RGB sc;
 
     float ka;
     float kd;

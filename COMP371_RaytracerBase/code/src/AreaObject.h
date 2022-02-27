@@ -6,7 +6,7 @@
 class AreaObject : public LightObject
 {
 public:
-    AreaObject(ObjectType type, Eigen::Vector3f id, Eigen::Vector3f is, 
+    AreaObject(ObjectType type, RGB id, RGB is, 
                 Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, Eigen::Vector3f p4);
     AreaObject(nlohmann::json j);
     AreaObject(const AreaObject& ao);

@@ -8,8 +8,8 @@ Output::Output(nlohmann::json j)
     this->camera = new Camera(j);
     this->outputFilename = std::string(j["filename"].get<std::string>());
     
-    this->ai = JsonArrayToVector3f(j["ai"]);
-    this->bkc = JsonArrayToVector3f(j["bkc"]);
+    this->ai = JsonArrayToRGB(j["ai"]);
+    this->bkc = JsonArrayToRGB(j["bkc"]);
 
     this->raysPerPixel = NULL;
     this->raysPerPixelSize = 0;

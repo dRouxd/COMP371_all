@@ -1,6 +1,8 @@
 #ifndef RGB_H
 #define RGB_H
 
+#include <iostream>
+
 class RGB
 {
 public:
@@ -28,7 +30,11 @@ private:
     friend RGB operator*(RGB rgb, int s);
     friend RGB operator*(RGB rgb, unsigned int s);
     friend RGB operator*(RGB rgb, float s);
+    friend RGB operator*(int s, RGB rgb);
+    friend RGB operator*(unsigned int s, RGB rgb);
+    friend RGB operator*(float s, RGB rgb);
     friend RGB operator*(RGB rgb1, const RGB& rgb2);
+    friend std::ostream& operator<<(std::ostream& os, const RGB rgb);
 
 };
 
@@ -37,6 +43,10 @@ RGB operator+(RGB rgb1, const RGB& rgb2);
 RGB operator*(RGB rgb, int s);
 RGB operator*(RGB rgb, unsigned int s);
 RGB operator*(RGB rgb, float s);
+RGB operator*(int s, RGB rgb);
+RGB operator*(unsigned int s, RGB rgb);
+RGB operator*(float s, RGB rgb);
 RGB operator*(RGB rgb1, const RGB& rgb2);
+std::ostream& operator<<(std::ostream& os, const RGB rgb);
 
 #endif

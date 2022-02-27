@@ -3,7 +3,7 @@
 
 #include "util.hpp"
 
-AreaObject::AreaObject(ObjectType type, Eigen::Vector3f id, Eigen::Vector3f is, 
+AreaObject::AreaObject(ObjectType type, RGB id, RGB is, 
                 Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, Eigen::Vector3f p4): LightObject(type, id, is)
 {
     this->p1 = p1;
@@ -31,8 +31,8 @@ AreaObject::AreaObject(const AreaObject& ao) : LightObject(ao)
 void AreaObject::print()
 {
     std::cout << "[AREAOBJECT"
-        << " id:" << PrintVector3fStrOneLine(this->id)
-        << " is:" << PrintVector3fStrOneLine(this->is)
+        << " id:" << this->id
+        << " is:" << this->is
         << " p1:" << PrintVector3fStrOneLine(this->p1)
         << " p2:" << PrintVector3fStrOneLine(this->p2)
         << " p3:" << PrintVector3fStrOneLine(this->p3)

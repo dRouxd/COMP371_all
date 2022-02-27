@@ -57,6 +57,22 @@ Eigen::Vector3f JsonArrayToVector3f(nlohmann::json j)
     return Eigen::Vector3f(elems[0], elems[1], elems[2]);
 }
 
+RGB JsonArrayToRGB(nlohmann::json j)
+{
+    
+    if(j.size() != 3)
+        throw std::runtime_error("JsonArrayToVector3f: Wrong number of json elements to convert to Vector3f");
+
+    float elems[3];
+    int i = 0;
+    for(auto it = j.begin(); it != j.end(); ++it, ++i)
+    {
+        elems[i] = (*it).get<float>();
+    }
+
+    return RGB(elems[0], elems[1], elems[2]);
+}
+
 GeometricObject* CreateGeometricObjectFromJson(nlohmann::json j)
 {
     if(j.count("type") != 1)

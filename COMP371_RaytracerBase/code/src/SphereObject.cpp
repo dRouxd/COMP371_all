@@ -3,7 +3,7 @@
 
 #include "util.hpp"
 
-SphereObject::SphereObject(std::string comment, Eigen::Vector3f ac, Eigen::Vector3f dc, Eigen::Vector3f sc,
+SphereObject::SphereObject(std::string comment, RGB ac, RGB dc, RGB sc,
                     float ka, float kd, float ks, float pc, Eigen::Vector3f centre, float radius):
                     GeometricObject(ObjectType::Sphere, comment, ac, dc, sc, ka, kd, ks, pc)
 {
@@ -32,9 +32,9 @@ Eigen::Vector3f SphereObject::getNormalFromPointOnSphere(Eigen::Vector3f point) 
 void SphereObject::print()
 {
     std::cout << "[SPHEREOBJECT"
-        << " ac:" << PrintVector3fStrOneLine(this->ac)
-        << " dc:" << PrintVector3fStrOneLine(this->dc)
-        << " sc:" << PrintVector3fStrOneLine(this->sc)
+        << " ac:" << this->ac
+        << " dc:" << this->dc
+        << " sc:" << this->sc
         << " ka:" << this->ka << " kd:" << this->kd << " ks:" << this->ks << " pc:" << this->pc
         << " center: " << PrintVector3fStrOneLine(this->centre) << " radius: " << this->radius
         << "]";

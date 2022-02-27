@@ -4,11 +4,8 @@
 #include "json.hpp"
 
 #include <string>
-#include <iostream>
 
 enum ObjectType{Sphere = 0, Rectangle = 1, Point = 2, Area = 3};
-
-#define OBJECT_OSTREAM_OP std::ostream& operator<<(std::ostream& os, const Object* o)
 
 class Object
 {
@@ -24,7 +21,5 @@ public:
 protected:
     ObjectType type;
 };
-
-//OBJECT_OSTREAM_OP;
 
 #endif

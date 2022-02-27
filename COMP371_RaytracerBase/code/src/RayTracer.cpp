@@ -241,11 +241,7 @@ void RayTracer::calcRayColorLocal(Ray* ray, GeometricObject* o, float oDist, Out
             o->getKA() * o->getAC()(1) * out->getAI()(0), 
             o->getKA() * o->getAC()(2) * out->getAI()(0));
 
-    // Calculate BSDF for every lights in the scene
-    for(auto l : this->lightObjects)
-    {
-        L += calcBSDF(point, ray, o, l);
-    }
+    L += calcBSDF(point, ray, o);
 
     // Clamp light value between 0 and 1
     L(0) = std::max(std::min(L(0), 1.0f), 0.0f);
@@ -260,7 +256,7 @@ void RayTracer::calcRayColorGlobal(Ray* ray, GeometricObject* o, float oDist, Ou
     
 }
 
-RGB RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, GeometricObject* o, LightObject* l)
+RGB RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, GeometricObject* o)
 {
     Eigen::Vector3f normalFromObject;
     if(o->getType() == ObjectType::Rectangle)
@@ -274,41 +270,45 @@ RGB RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, GeometricObject* o, LightObje
     if(normalFromObject.dot(r->getDirection()) > 0)
         normalFromObject = -normalFromObject;
 
-    Eigen::Vector3f lightDirection;
+    RGB L;
 
-    // TODO: if point light, keep that, otherwise do monte carlo integration on area light
-    if(l->getType() == ObjectType::Point)
+    // Calculate BSDF for every lights in the scene
+    for(auto l : this->lightObjects)
     {
-        PointObject* po = dynamic_cast<PointObject*>(l);
-        lightDirection = CreateNormalFrom2Points(p, po->getCentre());
+        Eigen::Vector3f lightDirection;
+
+        // TODO: if point light, keep that, otherwise do monte carlo integration on area light
+        if(l->getType() == ObjectType::Point)
+        {
+            PointObject* po = dynamic_cast<PointObject*>(l);
+            lightDirection = CreateNormalFrom2Points(p, po->getCentre());
+            
+            // Check if there's any objects in the path of to the light
+            Ray* rayToLight = new Ray(p, lightDirection);
+            float distToObs = -1.0f;
+            GeometricObject* lightObstructed = rayIntersectObjects(rayToLight, distToObs);
+            delete rayToLight;
+            
+            if(lightObstructed && distToObs < GetDistanceBetween2Points(p, po->getCentre()))
+                continue;
+        }
         
-        // Check if there's any objects in the path of to the light
-        Ray* rayToLight = new Ray(p, lightDirection);
-        float distToObs = -1.0f;
-        GeometricObject* lightObstructed = rayIntersectObjects(rayToLight, distToObs);
-        delete rayToLight;
-        
-        if(lightObstructed && distToObs < GetDistanceBetween2Points(p, po->getCentre()))
-            return RGB(0.0, 0.0, 0.0);
+        // I: Intensity of the light
+        RGB IL(l->getIS() * l->getID());
+
+        // Diffuse component of the color value
+        float maxD = std::max(0.0f, normalFromObject.dot(lightDirection));
+        RGB ID(o->getKD() * o->getDC() * maxD);
+
+        // Specular component of the color value
+        Eigen::Vector3f v = CreateNormalFrom2Points(p, r->getOrigin());
+        Eigen::Vector3f R = (2.0f * normalFromObject * (normalFromObject.dot(lightDirection)) - lightDirection);
+        Eigen::Vector3f H = (v + lightDirection).normalized();
+        float maxS = std::pow(std::max(0.0f, normalFromObject.dot(H)), o->getPC());
+        RGB IS(o->getKS() * o->getSC() * maxS);
+
+        L += IL * (ID + IS);
     }
-    
-    // I: Intensity of the light for each color
-    RGB IL(l->getIS()(0) * l->getID()(0), l->getIS()(1) * l->getID()(1), l->getIS()(2) * l->getID()(2));
-
-    // Diffuse component of the color value
-    float maxD = std::max(0.0f, normalFromObject.dot(lightDirection));
-    RGB ID(o->getKD() * o->getDC()(0), o->getKD() * o->getDC()(1), o->getKD() * o->getDC()(2));
-    ID *= maxD;
-
-    // Specular component of the color value
-    Eigen::Vector3f v = CreateNormalFrom2Points(p, r->getOrigin());
-    Eigen::Vector3f R = (2.0f * normalFromObject * (normalFromObject.dot(lightDirection)) - lightDirection);
-    Eigen::Vector3f H = (v + lightDirection).normalized();
-    float maxS = std::pow(std::max(0.0f, normalFromObject.dot(H)), o->getPC());
-    RGB IS(o->getKS() * o->getSC()(0), o->getKS() * o->getSC()(1), o->getKS() * o->getSC()(2));
-    IS *= maxS;
-
-    RGB L = IL * (ID + IS);
 
     return L;
 }

@@ -31,7 +31,7 @@ private:
     void calcRayColor(Ray* ray, GeometricObject* o, float oDist, Output* out);
     void calcRayColorLocal(Ray* ray, GeometricObject* o, float oDist, Output* out);
     void calcRayColorGlobal(Ray* ray, GeometricObject* o, float oDist, Output* out);
-    RGB calcBSDF(Eigen::Vector3f p, Ray* ray, GeometricObject* o, LightObject* l);
+    RGB calcBSDF(Eigen::Vector3f p, Ray* ray, GeometricObject* o);
 
     std::vector<GeometricObject*> geometricObjects;
     std::vector<LightObject*> lightObjects;
