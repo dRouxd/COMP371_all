@@ -63,6 +63,57 @@ RGB& RGB::operator*=(float s)
     return *this;
 }
 
+RGB& RGB::operator*=(int s)
+{
+    this->r *= s;
+    this->g *= s;
+    this->b *= s;
+    return *this;
+}
+
+RGB& RGB::operator*=(unsigned int s)
+{
+    this->r *= s;
+    this->g *= s;
+    this->b *= s;
+    return *this;
+}
+
+RGB& RGB::operator/=(const RGB& rgb)
+{
+    this->r /= rgb.r;
+    this->g /= rgb.g;
+    this->b /= rgb.b;
+    return *this;
+}
+
+RGB& RGB::operator/=(float s)
+{
+    
+    this->r /= s;
+    this->g /= s;
+    this->b /= s;
+    return *this;
+}
+
+RGB& RGB::operator/=(int s)
+{
+    
+    this->r /= s;
+    this->g /= s;
+    this->b /= s;
+    return *this;
+}
+
+RGB& RGB::operator/=(unsigned int s)
+{
+    
+    this->r /= s;
+    this->g /= s;
+    this->b /= s;
+    return *this;
+}
+
 float& RGB::operator()(int i)
 {
     switch (i)
@@ -157,6 +208,48 @@ RGB operator*(RGB rgb1, const RGB& rgb2)
     rgb1.r *= rgb2.r;
     rgb1.g *= rgb2.g;
     rgb1.b *= rgb2.b;
+    return rgb1;
+}
+
+RGB operator/(RGB rgb, int s)
+{
+    rgb /= s;
+    return rgb;
+}
+
+RGB operator/(RGB rgb, unsigned int s)
+{
+    rgb /= s;
+    return rgb;
+}
+
+RGB operator/(RGB rgb, float s)
+{
+    rgb /= s;
+    return rgb;
+}
+
+RGB operator/(int s, RGB rgb)
+{
+    rgb /= s;
+    return rgb;
+}
+
+RGB operator/(unsigned int s, RGB rgb)
+{
+    rgb /= s;
+    return rgb;
+}
+
+RGB operator/(float s, RGB rgb)
+{
+    rgb /= s;
+    return rgb;
+}
+
+RGB operator/(RGB rgb1, const RGB& rgb2)
+{
+    rgb1 /= rgb2;
     return rgb1;
 }
 

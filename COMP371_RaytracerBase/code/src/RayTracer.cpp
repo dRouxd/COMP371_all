@@ -13,6 +13,10 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
+#include <random>
+
+#define EPSILON 0.001
+#define AREALIGHT_MAX_SAMPLING 4
 
 RayTracer::RayTracer(nlohmann::json j)
 {
@@ -178,7 +182,7 @@ void RayTracer::calcRayColor(Ray* ray, Object* o, float oDist, Output* out)
 void RayTracer::calcRayColorLocal(Ray* ray, Object* o, float oDist, Output* out)
 {
     // Offset by small value to remove numerical imprecision.
-    Eigen::Vector3f point = ray->getOrigin() + (oDist - 0.001) * ray->getDirection();
+    Eigen::Vector3f point = ray->getOrigin() + (oDist - EPSILON) * ray->getDirection();
 
     // If the ray hits the area light, get the light value directly
     if(o->getType() == ObjectType::Area)
@@ -239,16 +243,16 @@ RGB RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, Geometric* o)
         // TODO: if point light, keep that, otherwise do monte carlo integration on area light
         if(l->getType() == ObjectType::Point)
         {
-            PointLight* po = dynamic_cast<PointLight*>(l);
-            lightDirection = CreateNormalFrom2Points(p, po->getCentre());
+            PointLight* pl = dynamic_cast<PointLight*>(l);
+            lightDirection = CreateNormalFrom2Points(p, pl->getCentre());
             
             // Check if there's any objects in the path of to the light
             Ray* rayToLight = new Ray(p, lightDirection);
-            float distToObs = -1.0f;
-            Object* lightObstructed = rayIntersectObjects(rayToLight, distToObs);
+            float distToObst = -1.0f;
+            Object* lightObstructed = rayIntersectObjects(rayToLight, distToObst);
             delete rayToLight;
             
-            if(lightObstructed && distToObs < GetDistanceBetween2Points(p, po->getCentre()))
+            if(lightObstructed && distToObst < GetDistanceBetween2Points(p, pl->getCentre()))
             {
                 // If the obstructed object is an area light, use the area light intensity for the calculations
                 if(lightObstructed->getType() == ObjectType::Area)
@@ -258,6 +262,56 @@ RGB RayTracer::calcBSDF(Eigen::Vector3f p, Ray* r, Geometric* o)
                 }else
                     continue;
             }
+        }else
+        {
+            AreaLight* al = dynamic_cast<AreaLight*>(l);
+
+            Eigen::Vector3f lightAverageLocation = Eigen::Vector3f::Zero();
+            RGB lightAverageIntensity;
+
+            Eigen::Vector3f p1p2 = al->getP2() - al->getP1();
+            Eigen::Vector3f p1p4 = al->getP4() - al->getP1();
+            float p1p2Len = (p1p2.norm() - 2*EPSILON) / AREALIGHT_MAX_SAMPLING;
+            float p1p4Len = (p1p4.norm() - 2*EPSILON) / AREALIGHT_MAX_SAMPLING;
+    
+            std::random_device rd; 
+            std::default_random_engine eng(rd());
+            std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+
+            float slopei = 1.0f / (p1p2.norm() - EPSILON);
+            float slopej = 1.0f / (p1p4.norm() - EPSILON);
+
+            // Sample the area light many times
+            for(int i = 0; i < AREALIGHT_MAX_SAMPLING; ++i)
+            {
+                for(int j = 0; j < AREALIGHT_MAX_SAMPLING; ++j)
+                {
+                    float randi = (EPSILON + p1p2Len*i + dist(eng)*p1p2Len);
+                    float randj = (EPSILON + p1p4Len*j + dist(eng)*p1p4Len);
+
+                    randi = slopei * (randi - EPSILON);
+                    randj = slopej * (randj - EPSILON);
+
+                    Eigen::Vector3f randPoint(al->getP1() + randi * p1p2 + randj * p1p4);
+                    Eigen::Vector3f vectToRandPoint = CreateNormalFrom2Points(p, randPoint);
+                    
+                    Ray* rayToLight = new Ray(p, vectToRandPoint);
+                    float distToObst = -1;
+                    Object* lightObstructed = rayIntersectObjects(rayToLight, distToObst);
+                    delete rayToLight;
+
+                    // If there's nothing blocking the ray to the area light, add this ray to the calculation
+                    if(distToObst >= GetDistanceBetween2Points(p, randPoint) - EPSILON)
+                    {
+                        lightAverageLocation += randPoint;
+                        lightAverageIntensity += l->getLightColor();
+                    }
+                }
+            }
+
+            IL = lightAverageIntensity / (AREALIGHT_MAX_SAMPLING * AREALIGHT_MAX_SAMPLING);
+            lightAverageLocation = lightAverageLocation / (AREALIGHT_MAX_SAMPLING * AREALIGHT_MAX_SAMPLING);
+            lightDirection = CreateNormalFrom2Points(p, lightAverageLocation);
         }
 
         // Diffuse component of the color value

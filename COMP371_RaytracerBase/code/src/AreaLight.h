@@ -12,6 +12,9 @@ public:
     AreaLight(nlohmann::json j);
     AreaLight(const AreaLight& ao);
     ~AreaLight() = default;
+
+    Eigen::Vector3f generateRandomPoint() const;
+
     void print();
 };
 
